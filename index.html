@@ -1,0 +1,2108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>司法試験タイピング — 用語ドリル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4efe3;
+    --paper-2:#efe8d8;
+    --ink:#20303a;
+    --ink-soft:#4a5a63;
+    --vermilion:#c5352a;
+    --rule:#aebb9f;
+    --muted:#a79f8c;
+    --mono: ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+    --mincho:"Shippori Mincho", serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%; margin:0; padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--mincho);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px; -webkit-font-smoothing:antialiased;
+    perspective: 1200px;
+    overflow-x: hidden;
+  }
+  .stage{ width:100%; max-width:780px; position:relative; }
+
+  .top{
+    display:flex; align-items:flex-end; justify-content:space-between; gap:16px;
+    padding:0 4px 10px; border-bottom:1.5px solid var(--ink);
+  }
+  .brand{ line-height:1.2; }
+  .brand .eyebrow{ font-size:11px; letter-spacing:.28em; color:var(--vermilion); font-weight:700; margin-bottom:4px; }
+  .brand h1{ margin:0; font-size:19px; font-weight:700; letter-spacing:.04em; }
+  .stats{ display:flex; gap:18px; font-family:var(--mono); text-align:right; }
+  .stat{ line-height:1.1; }
+  .stat b{ display:block; font-size:20px; font-weight:600; color:var(--ink); }
+  .stat span{ font-size:10px; letter-spacing:.14em; color:var(--muted); }
+  .stat.time b{ color:var(--vermilion); }
+
+  .panel{
+    position:relative; margin-top:16px; padding:40px 24px 32px;
+    border:1.5px solid var(--ink);
+    background:
+      repeating-linear-gradient(0deg, transparent 0 43px, rgba(174,187,159,.35) 43px 44px),
+      repeating-linear-gradient(90deg, transparent 0 43px, rgba(174,187,159,.35) 43px 44px),
+      var(--paper-2);
+    box-shadow:6px 6px 0 rgba(32,48,58,.10);
+    text-align:center; overflow:hidden; min-height:460px;
+    display:flex; flex-direction:column; justify-content:center; align-items:center;
+    transform-origin: center center;
+  }
+  .reading{ font-size:clamp(20px,4.4vw,30px); letter-spacing:.14em; min-height:1.4em; margin-bottom:6px; }
+  .reading .u{ color:var(--muted); transition:color .08s; }
+  .reading .u.done{ color:var(--vermilion); }
+  .reading .u.cur{ color:var(--ink); border-bottom:3px solid var(--vermilion); padding-bottom:1px; }
+  .term{ font-size:clamp(40px,10vw,76px); font-weight:800; letter-spacing:.06em; line-height:1.15; margin:4px 0 18px; color:var(--ink); }
+  .echo{ font-family:var(--mono); font-size:clamp(15px,3.4vw,20px); letter-spacing:.06em; color:var(--ink-soft); min-height:1.5em; }
+  .echo .typed{ color:var(--vermilion); font-weight:600; }
+  .echo .caret{ display:inline-block; width:.62ch; margin-left:1px; border-bottom:2px solid var(--ink); animation:blink 1s steps(1) infinite; }
+  @keyframes blink{50%{opacity:0;}}
+
+  .panel.miss{ animation:shake .22s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+  /* スタンプ（「済」および「GO!」「TIME UP!」用） */
+  .stamp{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; opacity:0; z-index:15; }
+  .stamp span{ font-size:120px; font-weight:800; color:var(--vermilion); border:8px solid var(--vermilion); border-radius:50%; width:180px; height:180px; display:flex; align-items:center; justify-content:center; transform:rotate(-14deg); }
+  .stamp.go{ animation:stamp .6s ease-out; }
+  .stamp.keep-show{ opacity: 0.92; transform: scale(1); }
+  @keyframes stamp{ 0%{opacity:0; transform:scale(1.5);} 18%{opacity:.92; transform:scale(1);} 70%{opacity:.92;} 100%{opacity:0; transform:scale(1);} }
+
+  .stamp.stamp-go-text span {
+    border: 8px solid var(--vermilion);
+    border-radius: 50%;
+    width: 220px;
+    height: 220px;
+    font-size: 84px;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+    text-shadow: none;
+    transform: rotate(-10deg);
+  }
+
+  .stamp.stamp-timeup-text span {
+    border: 8px solid var(--vermilion);
+    border-radius: 50%;
+    width: 260px;
+    height: 260px;
+    font-size: 48px;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+    text-shadow: none;
+    transform: rotate(-8deg);
+    background: rgba(244, 239, 227, 0.85);
+  }
+
+  .hint{ margin-top:12px; text-align:center; font-family:var(--mono); font-size:11.5px; letter-spacing:.06em; color:var(--muted); }
+  .hint b{ color:var(--vermilion); font-weight:600; }
+
+  .esc-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-soft);
+    background: rgba(244,239,227,0.85);
+    padding: 3px 8px;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 5;
+    letter-spacing: 0.05em;
+  }
+  .esc-badge b {
+    color: var(--vermilion);
+  }
+
+  .combo-bar-wrapper {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 5;
+  }
+  .combo-gauge-container {
+    flex: 1;
+    height: 10px;
+    background: rgba(32,48,58,.12);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(32,48,58,0.2);
+  }
+  .combo-gauge-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #a79f8c, var(--vermilion));
+    transition: width 0.15s ease-out;
+  }
+  
+  .combo-speech-bubble {
+    position: relative;
+    background: var(--vermilion);
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 8px;
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+  }
+  .combo-speech-bubble::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px 7px 5px 0;
+    border-style: solid;
+    border-color: transparent var(--ink) transparent transparent;
+  }
+  .combo-speech-bubble::after {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 4px 6px 4px 0;
+    border-style: solid;
+    border-color: transparent var(--vermilion) transparent transparent;
+  }
+  .combo-speech-bubble.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .combo-speech-bubble.pop {
+    animation: comboPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes comboPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.4) rotate(-3deg); background: #e6392b; box-shadow: 4px 4px 0 var(--ink); }
+    100% { transform: scale(1); }
+  }
+
+  .page-flip-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    z-index: 25;
+    pointer-events: none;
+    transform-origin: left center;
+    opacity: 0;
+  }
+  .page-flip-overlay.flip {
+    animation: pageTurn 0.6s ease-in-out forwards;
+  }
+  @keyframes pageTurn {
+    0% { opacity: 1; transform: rotateY(0deg); }
+    100% { opacity: 0; transform: rotateY(-90deg); }
+  }
+
+  .ready-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    pointer-events: none;
+    opacity: 0;
+    background: var(--paper-2);
+    transition: opacity 0.15s ease;
+  }
+  .ready-text {
+    font-family: var(--mono);
+    font-size: 64px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: 0.08em;
+    font-style: normal;
+    text-decoration: none;
+  }
+  .ready-overlay.show {
+    opacity: 1;
+  }
+
+  .overlay{
+    position:absolute; inset:0; background:rgba(244,239,227,.97);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:20px 20px; gap:12px; border:1.5px solid var(--ink);
+    overflow-y:auto; z-index: 10;
+  }
+  .overlay.hide{ display:none; }
+  .ov-eyebrow{ font-size:11px; letter-spacing:.3em; color:var(--vermilion); font-weight:700; }
+  .overlay h2{ margin:0; font-size:clamp(22px,5vw,34px); font-weight:800; letter-spacing:.04em; }
+  .overlay p{ margin:0; max-width:44ch; font-size:13.5px; line-height:1.7; color:var(--ink-soft); }
+  .rules{ font-family:var(--mono); font-size:12px; line-height:1.85; color:var(--ink-soft); }
+  .rules code{ background:rgba(197,53,42,.10); color:var(--vermilion); padding:1px 6px; border-radius:3px; }
+
+  .btn{
+    font-family:var(--mincho); font-weight:700; font-size:15px; letter-spacing:.1em;
+    color:var(--paper); background:var(--ink); border:none; padding:11px 28px; cursor:pointer;
+    box-shadow:3px 3px 0 var(--vermilion); transition:transform .06s, box-shadow .06s;
+  }
+  .btn:hover{ transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--vermilion); }
+  .btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--vermilion); }
+  .btn:focus-visible{ outline:3px solid var(--vermilion); outline-offset:3px; }
+  .btn.ghost{ color:var(--ink); background:transparent; border:1.5px solid var(--ink); box-shadow:2px 2px 0 rgba(32,48,58,.18); font-size:13px; padding:9px 20px; }
+
+  .timebar{ position:absolute; top:0; left:0; right:0; height:5px; background:rgba(32,48,58,.10); }
+  .timebar-fill{ height:100%; width:100%; background:var(--vermilion); transition:width .12s linear, background .3s; }
+  .timebar-fill.low{ background:#8f1f18; }
+  .bonus-flash{ position:absolute; top:25px; left:0; right:0; text-align:center; font-family:var(--mono); font-weight:600; font-size:15px; color:var(--vermilion); opacity:0; pointer-events:none; }
+  .bonus-flash.go{ animation:bonus .9s ease-out; }
+  @keyframes bonus{ 0%{opacity:0; transform:translateY(6px);} 20%{opacity:1; transform:translateY(0);} 80%{opacity:1;} 100%{opacity:0; transform:translateY(-8px);} }
+  .echo .err{ color:#fff; background:var(--vermilion); border-radius:2px; padding:0 2px; text-decoration:line-through; }
+
+  .modes{ justify-content:flex-start; gap:8px; padding-top:14px; padding-bottom:14px; }
+  .modes .head-row{ display:flex; align-items:center; justify-content:center; gap:12px; width:100%; position:relative; }
+  .modes h2{ font-size:20px; margin:0; }
+  
+  .strict-mode-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    background: rgba(32,48,58,0.06);
+    padding: 3px 8px;
+    border: 1px solid var(--ink-soft);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--mono);
+    cursor: pointer;
+    margin-left: 2px;
+  }
+
+  .tabs{ display:flex; gap:6px; width:100%; max-width:600px; }
+  .tab{ flex:1; font-family:var(--mincho); font-weight:700; font-size:13px; letter-spacing:.02em; padding:7px 2px; cursor:pointer; color:var(--ink-soft); background:transparent; border:1.5px solid var(--ink); transition:background .1s,color .1s; }
+  .tab:hover:not(.active){ background:#fff6ee; }
+  .tab.active{ background:var(--ink); color:var(--paper); box-shadow:2px 2px 0 var(--vermilion); }
+  .tab:focus-visible{ outline:3px solid var(--vermilion); outline-offset:2px; }
+  .tab-body{ width:100%; max-width:600px; }
+  .course-spacer{ visibility:hidden; }
+  .course-list{ display:grid; grid-template-columns:repeat(2,1fr); gap:6px; }
+  .course-list.one{ grid-template-columns:1fr; }
+  .course{
+    text-align:left; font-family:var(--mincho); cursor:pointer;
+    background:var(--paper); border:1.5px solid var(--ink); padding:8px 12px;
+    display:flex; flex-direction:column; gap:1px; transition:background .1s, transform .06s;
+  }
+  .course:hover{ background:#fff6ee; transform:translate(-1px,-1px); }
+  .course:focus-visible{ outline:3px solid var(--vermilion); outline-offset:2px; }
+  .course .cname{ font-size:15px; font-weight:700; }
+  .course .cdesc{ font-family:var(--mono); font-size:11px; color:var(--vermilion); letter-spacing:.04em; }
+  .course.wip{ cursor:not-allowed; opacity:.55; border-style:dashed; background:repeating-linear-gradient(45deg, var(--paper) 0 6px, #e9e2d2 6px 12px); }
+  .course.wip:hover{ transform:none; background:repeating-linear-gradient(45deg, var(--paper) 0 6px, #e9e2d2 6px 12px); }
+  .course .cdesc.wip-tag{ color:var(--muted); }
+
+  .modal-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 40; padding: 20px;
+  }
+  .modal-overlay.hide { display: none; }
+  .modal-box {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    padding: 20px;
+    max-width: 360px;
+    box-shadow: 6px 6px 0 var(--ink);
+    text-align: left;
+  }
+  .modal-box h3 { margin: 0 0 10px; font-size: 16px; color: var(--vermilion); border-bottom: 1px solid var(--ink); padding-bottom: 4px; }
+  .modal-box p { font-size: 13px; line-height: 1.6; margin: 0 0 14px; color: var(--ink); }
+
+  .result{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px 18px; font-family:var(--mono); justify-content:center; max-width: 520px; margin: 0 auto; }
+  .result .r{
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .result .r.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .result .r b{ display:block; font-size:26px; font-weight:600; color:var(--vermilion); }
+  .result .r span{ font-size:11px; letter-spacing:.12em; color:var(--muted); }
+  
+  .rank-box {
+    grid-column: span 3;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    padding: 8px 16px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 2px 2px 0 rgba(32,48,58,.10);
+  }
+  .rank-box .rank-label {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+  }
+  .rank-box .rank-value {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--vermilion);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .btn-row{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top: 6px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .btn-row.visible{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .course-tag{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); letter-spacing:.08em; }
+
+  @media (prefers-reduced-motion: reduce){
+    .panel.miss, .stamp.go, .echo .caret, .btn, .course, .bonus-flash.go, .combo-speech-bubble.pop, .page-flip-overlay.flip { animation:none; transition:none; }
+    .stamp.go{ opacity:0; }
+  }
+  @media (max-width:520px){
+    .stats{ gap:10px; }
+    .panel{ padding:30px 12px 24px; }
+    .course-list{ grid-template-columns:1fr; }
+    .result { grid-template-columns: repeat(2, 1fr); }
+    .rank-box { grid-column: span 2; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="top">
+    <div class="brand">
+      <div class="eyebrow" id="eyebrow">司法試験 · 用語ドリル</div>
+      <h1>タイピング演習</h1>
+    </div>
+    <div class="stats">
+      <div class="stat time"><b id="stTime">60.0</b><span>残り秒</span></div>
+      <div class="stat"><b id="stCombo">0</b><span>コンボ</span></div>
+      <div class="stat"><b id="stClear">0</b><span>済</span></div>
+      <div class="stat"><b id="stAcc">100</b><span>正確率 %</span></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel">
+    <div class="timebar" id="timebar"><div class="timebar-fill" id="timebarFill"></div></div>
+    
+    <div class="combo-bar-wrapper">
+      <div class="combo-gauge-container"><div class="combo-gauge-fill" id="comboGauge"></div></div>
+      <div class="combo-speech-bubble" id="comboBubble">10 COMBO</div>
+    </div>
+
+    <div class="esc-badge"><b>[Esc]</b> コース選択に戻る</div>
+
+    <div class="bonus-flash" id="bonusFlash"></div>
+    <div class="reading" id="reading"></div>
+    <div class="term" id="term">—</div>
+    <div class="echo" id="echo"></div>
+    
+    <div class="stamp" id="stamp"><span>済</span></div>
+    <div class="stamp stamp-go-text" id="goStamp"><span>GO!</span></div>
+    <div class="stamp stamp-timeup-text" id="timeupStamp"><span>TIME UP!</span></div>
+
+    <div class="page-flip-overlay" id="pageFlip"></div>
+    <div class="ready-overlay" id="readyOverlay"><div class="ready-text">READY</div></div>
+
+    <!-- TITLE -->
+    <div class="overlay" id="ovTitle">
+      <div class="ov-eyebrow">司法試験 TYPING</div>
+      <h2>司法試験タイピング</h2>
+      <p>漢字とふりがなが表示されます。<b>読みをローマ字で入力</b>して、60秒でいくつ打てるか挑戦。</p>
+      <button class="btn" id="btnGameStart">コースを選択する</button>
+      <div class="rules">
+        し=<code>shi</code>/<code>si</code> じ=<code>ji</code>/<code>zi</code> っ=子音重ね（<code>kka</code>） ん=<code>n</code>/<code>nn</code>
+      </div>
+    </div>
+
+    <!-- MODE SELECT -->
+    <div class="overlay modes hide" id="ovModes">
+      <div class="head-row">
+        <h2>出題モード</h2>
+        <label class="strict-mode-inline">
+          <input type="checkbox" id="chkStrictBS">
+          <span>精密モード</span>
+          <span class="info-icon" id="btnStrictInfo">i</span>
+        </label>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab" data-tab="subject">科目で選ぶ</button>
+        <button class="tab" data-tab="length">文字数で選ぶ</button>
+        <button class="tab" data-tab="all">総まくる</button>
+      </div>
+      <div class="tab-body" id="tabBody"></div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="overlay hide" id="ovResult">
+      <div class="ov-eyebrow">採点結果</div>
+      <div class="course-tag" id="rCourse">総まくりコース</div>
+      <div class="result">
+        <div class="r rank-box" id="rItemRank">
+          <span class="rank-label">評価ランク</span>
+          <b class="rank-value" id="rRank">S</b>
+        </div>
+        <div class="r" id="rItem1"><b id="rKeys">0</b><span>打鍵数</span></div>
+        <div class="r" id="rItem2"><b id="rClear">0</b><span>クリア語数</span></div>
+        <div class="r" id="rItem3"><b id="rCombo">0</b><span>最大コンボ</span></div>
+        <div class="r" id="rItem4"><b id="rAcc">0</b><span>正確率 %</span></div>
+        <div class="r" id="rItem5"><b id="rKpm">0</b><span>打鍵 / 分</span></div>
+      </div>
+      <div class="btn-row" id="rBtnRow">
+        <button class="btn" id="btnRetry">もう一度 (Space/Enter)</button>
+        <button class="btn ghost" id="btnBackModes">コース選択へ (Esc)</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay hide" id="modalInfo">
+      <div class="modal-box">
+        <h3>精密モードとは</h3>
+        <p>精密モードとは、ミスタイプをした場合に、backspaceキーを押さなければ先に進めないモードです。<br>より実践的な練習ができますが、上級者向けです。</p>
+        <button class="btn" id="btnCloseModal" style="width:100%; padding:8px;">閉じる</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hint" id="hintText">
+    入力はローマ字（<b>IMEはオフ</b>）。[Esc]でコース選択に戻る／PC・物理キーボード推奨
+  </div>
+</div>
+
+<script>
+/* 出題データ */
+const WORDS = [
+  // 憲法
+  { k:"憲法",                          r:"けんぽう",                                 s:"憲法" },
+  { k:"天皇",                          r:"てんのう",                                 s:"憲法" },
+  { k:"請願権",                        r:"せいがんけん",                             s:"憲法" },
+  { k:"公務員",                        r:"こうむいん",                               s:"憲法" },
+  { k:"投票の秘密",                    r:"とうひょうのひみつ",                       s:"憲法" },
+  { k:"全体の奉仕者",                  r:"ぜんたいのほうししゃ",                     s:"憲法" },
+  { k:"国家賠償",                      r:"こっかばいしょう",                         s:"憲法" },
+  { k:"思想良心の自由",                r:"しそうりょうしんのじゆう",                 s:"憲法" },
+  { k:"信教の自由",                    r:"しんきょうのじゆう",                       s:"憲法" },
+  { k:"結社の自由",                    r:"けっしゃのじゆう",                         s:"憲法" },
+  { k:"集会の自由",                    r:"しゅうかいのじゆう",                       s:"憲法" },
+  { k:"行政権",                        r:"ぎょうせいけん",                           s:"憲法" },
+  { k:"司法権",                        r:"しほうけん",                               s:"憲法" },
+  { k:"立法権",                        r:"りっぽうけん",                             s:"憲法" },
+  { k:"居住移転の自由",                r:"きょじゅういてんのじゆう",                 s:"憲法" },
+  { k:"学問の自由",                    r:"がくもんのじゆう",                         s:"憲法" },
+  { k:"同性婚",                        r:"どうせいこん",                             s:"憲法" },
+  { k:"夫婦同氏性",                    r:"ふうふどうしせい",                         s:"憲法" },
+  { k:"公共の福祉",                    r:"こうきょうのふくし",                       s:"憲法" },
+  { k:"職業遂行の自由",                r:"しょくぎょうすいこうのじゆう",             s:"憲法" },
+  { k:"営業の自由",                    r:"えいぎょうのじゆう",                       s:"憲法" },
+  { k:"指紋押捺",                      r:"しもんおうなつ",                           s:"憲法" },
+  { k:"よど号ハイジャック記事抹消事件",r:"よどごうはいじゃっくきじまっしょうじけん", s:"憲法" },
+  { k:"肖像権",                        r:"しょうぞうけん",                           s:"憲法" },
+  { k:"プライバシー権",                r:"ぷらいばしーけん",                         s:"憲法" },
+  { k:"住基ネット",                    r:"じゅうきねっと",                           s:"憲法" },
+  { k:"マイナンバー",                  r:"まいなんばー",                             s:"憲法" },
+  { k:"囚われの聴衆",                  r:"とらわれのちょうしゅう",                   s:"憲法" },
+  { k:"エホバの証人",                  r:"えほばのしょうにん",                       s:"憲法" },
+  { k:"性同一性障害特例法違憲判決",    r:"せいどういつせいしょうがいとくれいほういけんはんけつ", s:"憲法" },
+  { k:"旧優生保護法違憲判決",          r:"きゅうゆうせいほごほういけんはんけつ",     s:"憲法" },
+  { k:"尊属殺違憲判決",                r:"そんぞくさついけんはんけつ",               s:"憲法" },
+  { k:"国籍法違憲判決",                r:"こくせきほういけんはんけつ",               s:"憲法" },
+  { k:"再婚禁止期間違憲判決",          r:"さいこんきんしきかんいけんはんけつ",       s:"憲法" },
+  { k:"目的効果基準",                  r:"もくてきこうかきじゅん",                   s:"憲法" },
+  { k:"性質説",                        r:"せいしつせつ",                             s:"憲法" },
+  { k:"八幡製鉄事件",                  r:"やはたせいてつじけん",                     s:"憲法" },
+  { k:"集団示威行動",                  r:"しゅうだんじいこうどう",                   s:"憲法" },
+  { k:"津地鎮祭事件",                  r:"つじちんさいじけん",                       s:"憲法" },
+  { k:"空知太事件",                    r:"そらちぶとじけん",                         s:"憲法" },
+  { k:"有害図書",                      r:"ゆうがいとしょ",                           s:"憲法" },
+  { k:"チャタレイ事件",                r:"ちゃたれいじけん",                         s:"憲法" },
+  { k:"パブリックフォーラム",          r:"ぱぶりっくふぉーらむ",                     s:"憲法" },
+  { k:"厳格な基準",                    r:"げんかくなきじゅん",                       s:"憲法" },
+  { k:"中間審査基準",                  r:"ちゅうかんしんさきじゅん",                 s:"憲法" },
+  { k:"比較衡量",                      r:"ひかくこうりょう",                         s:"憲法" },
+  { k:"税関審査",                      r:"ぜいかんしんさ",                           s:"憲法" },
+  { k:"レペタ",                        r:"れぺた",                                   s:"憲法" },
+  { k:"取材源の秘匿",                  r:"しゅざいげんのひとく",                     s:"憲法" },
+  { k:"泉佐野市民会館事件",            r:"いずみさのしみんかいかんじけん",           s:"憲法" },
+  { k:"徳島市公安条例事件",            r:"とくしましこうあんじょうれいじけん",       s:"憲法" },
+  { k:"ぽぽろ事件",                    r:"ぽぽろじけん",                             s:"憲法" },
+  { k:"薬事法違憲判決",                r:"やくじほういけんはんけつ",                 s:"憲法" },
+  { k:"やむにやまれぬ利益",            r:"やむにやまれぬりえき",                     s:"憲法" },
+  { k:"重要な利益",                    r:"じゅうようなりえき",                       s:"憲法" },
+  { k:"正当な利益",                    r:"せいとうなりえき",                         s:"憲法" },
+  { k:"合理的関連性",                  r:"ごうりてきかんれんせい",                   s:"憲法" },
+  { k:"実質的関連性",                  r:"じっしつてきかんれんせい",                 s:"憲法" },
+  { k:"森林法違憲判決",                r:"しんりんほういけんはんけつ",               s:"憲法" },
+  { k:"検閲の禁止",                    r:"けんえつのきんし",                         s:"憲法" },
+  { k:"統治機構",                      r:"とうちきこう",                             s:"憲法" },
+  { k:"立法不作為",                    r:"りっぽうふさくい",                         s:"憲法" },
+  { k:"政教分離原則",                  r:"せいきょうぶんりげんそく",                 s:"憲法" },
+  { k:"内閣総理大臣",                  r:"ないかくそうりだいじん",                   s:"憲法" },
+  { k:"規制目的二分論",                r:"きせいもくてきにぶんろん",                 s:"憲法" },
+  { k:"表現の自由",                    r:"ひょうげんのじゆう",                       s:"憲法" },
+  { k:"職業選択の自由",                r:"しょくぎょうせんたくのじゆう",             s:"憲法" },
+  { k:"違憲審査権",                    r:"いけんしんさけん",                         s:"憲法" },
+  { k:"財産権の保障",                  r:"ざいさんけんのほしょう",                   s:"憲法" },
+  { k:"生存権",                        r:"せいぞんけん",                             s:"憲法" },
+  { k:"幸福追求権",                    r:"こうふくついきゅうけん",                   s:"憲法" },
+  { k:"知る権利",                      r:"しるけんり",                               s:"憲法" },
+  { k:"比例原則",                  r:"ひれいげんそく",                     s:"憲法" },
+  { k:"法の下の平等",                  r:"ほうのもとのびょうどう",                   s:"憲法" },
+  { k:"精神的自由権",                  r:"せいしんてきじゆうけん",                   s:"憲法" },
+  { k:"二重の基準の理論",              r:"にじゅうのきじゅんのりろん",               s:"憲法" },
+  { k:"明確性の原則",                  r:"めいかくせいのげんそく",                   s:"憲法" },
+  { k:"適正手続",                      r:"てきせいてつづき",                         s:"憲法" },
+  { k:"司法権の限界",                  r:"しほうけんのげんかい",                     s:"憲法" },
+  { k:"部分社会の法理",                r:"ぶぶんしゃかいのほうり",                   s:"憲法" },
+  { k:"財政民主主義",                  r:"ざいせいみんしゅしゅぎ",                   s:"憲法" },
+  { k:"参政権",                        r:"さんせいけん",                             s:"憲法" },
+  { k:"人身の自由",                    r:"じんしんのじゆう",                         s:"憲法" },
+  { k:"象徴天皇制", r:"しょうちょうてんのうせい", s:"憲法" },
+  { k:"天皇の国事行為", r:"てんのうのこくじこうい", s:"憲法" },
+  { k:"国民主権", r:"こくみんしゅけん", s:"憲法" },
+  { k:"平和主義", r:"へいわしゅぎ", s:"憲法" },
+  { k:"自己決定権", r:"じこけっていけん", s:"憲法" },
+  { k:"アクセス権", r:"あくせすけん", s:"憲法" },
+  { k:"事前抑制", r:"じぜんよくせい", s:"憲法" },
+  { k:"明白かつ現在の危険", r:"めいはくかつげんざいのきけん", s:"憲法" },
+  { k:"営利的言論", r:"えいりてきげんろん", s:"憲法" },
+  { k:"報道の自由", r:"ほうどうのじゆう", s:"憲法" },
+  { k:"取材の自由", r:"しゅざいのじゆう", s:"憲法" },
+  { k:"教科書検定", r:"きょうかしょけんてい", s:"憲法" },
+  { k:"大学の自治", r:"だいがくのじち", s:"憲法" },
+  { k:"加持祈祷事件", r:"かじきとうじけん", s:"憲法" },
+  { k:"三菱樹脂事件", r:"みつびしじゅしじけん", s:"憲法" },
+  { k:"私人間効力", r:"しじんかんこうりょく", s:"憲法" },
+  { k:"間接適用説", r:"かんせつてきようせつ", s:"憲法" },
+  { k:"マクリーン事件", r:"まくりーんじけん", s:"憲法" },
+  { k:"外国人の人権", r:"がいこくじんのじんけん", s:"憲法" },
+  { k:"法人の人権", r:"ほうじんのじんけん", s:"憲法" },
+  { k:"特別権力関係", r:"とくべつけんりょくかんけい", s:"憲法" },
+  { k:"猿払事件", r:"さるふつじけん", s:"憲法" },
+  { k:"堀木訴訟", r:"ほりきそしょう", s:"憲法" },
+  { k:"朝日訴訟", r:"あさひそしょう", s:"憲法" },
+  { k:"プログラム規定説", r:"ぷろぐらむきていせつ", s:"憲法" },
+  { k:"旭川学テ事件", r:"あさひかわがくてじけん", s:"憲法" },
+  { k:"教育を受ける権利", r:"きょういくをうけるけんり", s:"憲法" },
+  { k:"労働基本権", r:"ろうどうきほんけん", s:"憲法" },
+  { k:"租税法律主義", r:"そぜいほうりつしゅぎ", s:"憲法" },
+  { k:"条例制定権", r:"じょうれいせいていけん", s:"憲法" },
+  { k:"地方自治の本旨", r:"ちほうじちのほんし", s:"憲法" },
+  { k:"団体自治", r:"だんたいじち", s:"憲法" },
+  { k:"住民自治", r:"じゅうみんじち", s:"憲法" },
+  { k:"適用違憲", r:"てきよういけん", s:"憲法" },
+  { k:"法令違憲", r:"ほうれいいけん", s:"憲法" },
+  { k:"統治行為論", r:"とうちこういろん", s:"憲法" },
+  { k:"砂川事件", r:"すながわじけん", s:"憲法" },
+  { k:"衆議院の解散", r:"しゅうぎいんのかいさん", s:"憲法" },
+  { k:"国政調査権", r:"こくせいちょうさけん", s:"憲法" },
+  { k:"内閣不信任決議", r:"ないかくふしんにんけつぎ", s:"憲法" },
+
+  // 行政法
+  { k:"国家賠償責任",                  r:"こっかばいしょうせきにん",                 s:"行政法" },
+  { k:"損失補償",                      r:"そんしつほしょう",                         s:"行政法" },
+  { k:"処分性",                        r:"しょぶんせい",                             s:"行政法" },
+  { k:"原告適格",                      r:"げんこくてきかく",                         s:"行政法" },
+  { k:"行政指導",                      r:"ぎょうせいしどう",                         s:"行政法" },
+  { k:"不利益変更禁止",                r:"ふりえきへんこうきんし",                   s:"行政法" },
+  { k:"裁量権の逸脱",                  r:"さいりょうけんのいつだつ",                 s:"行政法" },
+  { k:"裁量権の濫用",                  r:"さいりょうけんのらんよう",                 s:"行政法" },
+  { k:"訴えの利益",                    r:"うったえのりえき",                         s:"行政法" },
+  { k:"義務付け訴訟",                  r:"ぎむづけそしょう",                         s:"行政法" },
+  { k:"差止訴訟",                      r:"さしとめそしょう",                         s:"行政法" },
+  { k:"執行停止",                      r:"しっこうていし",                           s:"行政法" },
+  { k:"理由付記",                      r:"りゆうふき",                               s:"行政法" },
+  { k:"公法上の当事者訴訟",            r:"こうほうじょうのとうじしゃそしょう",       s:"行政法" },
+  { k:"職権取消し",                    r:"しょっけんとりけし",                       s:"行政法" },
+  { k:"理由の差替え",                  r:"りゆうのさしかえ",                         s:"行政法" },
+  // 行政法（追加）
+  { k:"行政行為", r:"ぎょうせいこうい", s:"行政法" },
+  { k:"行政裁量", r:"ぎょうせいさいりょう", s:"行政法" },
+  { k:"裁量権の逸脱濫用", r:"さいりょうけんのいつだつらんよう", s:"行政法" },
+  { k:"覊束行為", r:"きそくこうい", s:"行政法" },
+  { k:"行政計画", r:"ぎょうせいけいかく", s:"行政法" },
+  { k:"行政契約", r:"ぎょうせいけいやく", s:"行政法" },
+  { k:"行政立法", r:"ぎょうせいりっぽう", s:"行政法" },
+  { k:"委任命令", r:"いにんめいれい", s:"行政法" },
+  { k:"執行命令", r:"しっこうめいれい", s:"行政法" },
+  { k:"法規命令", r:"ほうきめいれい", s:"行政法" },
+  { k:"行政規則", r:"ぎょうせいきそく", s:"行政法" },
+  { k:"通達", r:"つうたつ", s:"行政法" },
+  { k:"申請", r:"しんせい", s:"行政法" },
+  { k:"許可", r:"きょか", s:"行政法" },
+  { k:"認可", r:"にんか", s:"行政法" },
+  { k:"特許", r:"とっきょ", s:"行政法" },
+  { k:"公定力", r:"こうていりょく", s:"行政法" },
+  { k:"不可争力", r:"ふかそうりょく", s:"行政法" },
+  { k:"不可変更力", r:"ふかへんこうりょく", s:"行政法" },
+  { k:"行政行為の撤回", r:"ぎょうせいこういのてっかい", s:"行政法" },
+  { k:"行政行為の職権取消し", r:"ぎょうせいこういのしょっけんとりけし", s:"行政法" },
+  { k:"行政行為の附款", r:"ぎょうせいこういのふかん", s:"行政法" },
+  { k:"瑕疵の治癒", r:"かしのちゆ", s:"行政法" },
+  { k:"違法性の承継", r:"いほうせいのしょうけい", s:"行政法" },
+  { k:"行政上の強制執行", r:"ぎょうせいじょうのきょうせいしっこう", s:"行政法" },
+  { k:"代執行", r:"だいしっこう", s:"行政法" },
+  { k:"執行罰", r:"しっこうばつ", s:"行政法" },
+  { k:"直接強制", r:"ちょくせつきょうせい", s:"行政法" },
+  { k:"即時強制", r:"そくじきょうせい", s:"行政法" },
+  { k:"行政調査", r:"ぎょうせいちょうさ", s:"行政法" },
+  { k:"行政手続法", r:"ぎょうせいてつづきほう", s:"行政法" },
+  { k:"聴聞", r:"ちょうもん", s:"行政法" },
+  { k:"弁明の機会の付与", r:"べんめいのきかいのふよ", s:"行政法" },
+  { k:"理由の提示", r:"りゆうのていじ", s:"行政法" },
+  { k:"標準処理期間", r:"ひょうじゅんしょりきかん", s:"行政法" },
+  { k:"審査基準", r:"しんさきじゅん", s:"行政法" },
+  { k:"処分基準", r:"しょぶんきじゅん", s:"行政法" },
+  { k:"情報公開", r:"じょうほうこうかい", s:"行政法" },
+  { k:"個人情報保護", r:"こじんじょうほうほご", s:"行政法" },
+  { k:"取消訴訟", r:"とりけしそしょう", s:"行政法" },
+  { k:"無効等確認訴訟", r:"むこうとうかくにんそしょう", s:"行政法" },
+  { k:"不作為の違法確認訴訟", r:"ふさくいのいほうかくにんそしょう", s:"行政法" },
+  { k:"民衆訴訟", r:"みんしゅうそしょう", s:"行政法" },
+  { k:"機関訴訟", r:"きかんそしょう", s:"行政法" },
+  { k:"狭義の訴えの利益", r:"きょうぎのうったえのりえき", s:"行政法" },
+  { k:"事情判決", r:"じじょうはんけつ", s:"行政法" },
+  { k:"仮の義務付け", r:"かりのぎむづけ", s:"行政法" },
+  { k:"仮の差止め", r:"かりのさしとめ", s:"行政法" },
+  { k:"原処分主義", r:"げんしょぶんしゅぎ", s:"行政法" },
+  { k:"公権力の行使", r:"こうけんりょくのこうし", s:"行政法" },
+  { k:"営造物責任", r:"えいぞうぶつせきにん", s:"行政法" },
+  { k:"公の営造物", r:"おおやけのえいぞうぶつ", s:"行政法" },
+  { k:"求償権", r:"きゅうしょうけん", s:"行政法" },
+  { k:"公物", r:"こうぶつ", s:"行政法" },
+  { k:"行政主体", r:"ぎょうせいしゅたい", s:"行政法" },
+  { k:"行政機関", r:"ぎょうせいきかん", s:"行政法" },
+  { k:"代理", r:"だいり", s:"行政法" },
+  { k:"委任", r:"いにん", s:"行政法" },
+  { k:"専決", r:"せんけつ", s:"行政法" },
+  { k:"免除", r:"めんじょ", s:"行政法" },
+  { k:"公証", r:"こうしょう", s:"行政法" },
+  { k:"受理", r:"じゅり", s:"行政法" },
+  { k:"授益的行政行為", r:"じゅえきてきぎょうせいこうい", s:"行政法" },
+  { k:"侵害的行政行為", r:"しんがいてきぎょうせいこうい", s:"行政法" },
+  { k:"第三者効", r:"だいさんしゃこう", s:"行政法" },
+  { k:"二重効果的行政行為", r:"にじゅうこうかてきぎょうせいこうい", s:"行政法" },
+  { k:"届出制", r:"とどけでせい", s:"行政法" },
+  { k:"許認可", r:"きょにんか", s:"行政法" },
+  { k:"パブリックコメント", r:"ぱぶりっくこめんと", s:"行政法" },
+  { k:"意見公募手続", r:"いけんこうぼてつづき", s:"行政法" },
+  { k:"行政不服審査法", r:"ぎょうせいふふくしんさほう", s:"行政法" },
+  { k:"不服申立て", r:"ふふくもうしたて", s:"行政法" },
+  { k:"再審査請求", r:"さいしんさせいきゅう", s:"行政法" },
+  { k:"裁決", r:"さいけつ", s:"行政法" },
+  { k:"被告適格", r:"ひこくてきかく", s:"行政法" },
+  { k:"抗告訴訟", r:"こうこくそしょう", s:"行政法" },
+  { k:"客観訴訟", r:"きゃっかんそしょう", s:"行政法" },
+  { k:"主観訴訟", r:"しゅかんそしょう", s:"行政法" },
+  { k:"判決の拘束力", r:"はんけつのこうそくりょく", s:"行政法" },
+  { k:"反射的利益", r:"はんしゃてきりえき", s:"行政法" },
+  { k:"法律上保護された利益", r:"ほうりつじょうほごされたりえき", s:"行政法" },
+  { k:"行政裁量の司法審査", r:"ぎょうせいさいりょうのしほうしんさ", s:"行政法" },
+  { k:"判断過程審査", r:"はんだんかていしんさ", s:"行政法" },
+  { k:"社会観念審査", r:"しゃかいかんねんしんさ", s:"行政法" },
+  { k:"比例原則", r:"ひれいげんそく", s:"行政法" },
+  { k:"平等原則", r:"びょうどうげんそく", s:"行政法" },
+  { k:"信頼保護原則", r:"しんらいほごげんそく", s:"行政法" },
+
+  // 民法
+  { k:"物上代位",                      r:"ぶつじょうだいい",                         s:"民法" },
+  { k:"法定地上権",                    r:"ほうていちじょうけん",                     s:"民法" },
+  { k:"根抵当権",                      r:"ねていとうけん",                           s:"民法" },
+  { k:"不当利得",                      r:"ふとうりとく",                             s:"民法" },
+  { k:"留置権",                        r:"りゅうちけん",                             s:"民法" },
+  { k:"取得時効",                      r:"しゅとくじこう",                           s:"民法" },
+  { k:"即時取得",                      r:"そくじしゅとく",                           s:"民法" },
+  { k:"詐害行為取消権",                r:"さがいこういとりけしけん",                 s:"民法" },
+  { k:"抵当権消滅請求",                r:"ていとうけんしょうめつせいきゅう",         s:"民法" },
+  { k:"遺留分侵害額請求",              r:"いりゅうぶんしんがいがくせいきゅう",       s:"民法" },
+  { k:"詐欺取消",                      r:"さぎとりけし",                             s:"民法" },
+  { k:"錯誤取消",                      r:"さくごとりけし",                           s:"民法" },
+  { k:"無権代理",                      r:"むけんだいり",                             s:"民法" },
+  { k:"表見代理",                      r:"ひょうけんだいり",                         s:"民法" },
+  { k:"消滅時効",                      r:"しょうめつじこう",                         s:"民法" },
+  { k:"危険負担",                      r:"きけんふたん",                             s:"民法" },
+  { k:"債務不履行",                    r:"さいむふりこう",                           s:"民法" },
+  { k:"不法行為",                      r:"ふほうこうい",                             s:"民法" },
+  { k:"相殺",                          r:"そうさい",                                 s:"民法" },
+  { k:"契約解除",                      r:"けいやくかいじょ",                         s:"民法" },
+  { k:"担保責任",                      r:"たんぽせきにん",                           s:"民法" },
+  { k:"連帯債務",                      r:"れんたいさいむ",                           s:"民法" },
+  { k:"債権譲渡",                      r:"さいけんじょうと",                         s:"民法" },
+  { k:"免責的債務引受",                r:"めんせきてきさいむひきうけ",               s:"民法" },
+  { k:"弁済による代位",                r:"べんさいによるだいい",                     s:"民法" },
+  { k:"賃貸人の地位の移転",            r:"ちんたいにんのちいのいてん",               s:"民法" },
+  { k:"転貸借",                        r:"てんたいしゃく",                           s:"民法" },
+  { k:"配偶者居住権",                  r:"はいぐうしゃきょじゅうけん",               s:"民法" },
+  { k:"錯誤",                          r:"さくご",                                   s:"民法" },
+  { k:"虚偽表示",                      r:"きょぎひょうじ",                           s:"民法" },
+  { k:"詐欺",                          r:"さぎ",                                     s:"民法" },
+  { k:"強迫",                          r:"きょうはく",                               s:"民法" },
+  { k:"公示",                          r:"こうじ",                                   s:"民法" },
+  { k:"到達主義",                      r:"とうたつしゅぎ",                           s:"民法" },
+  { k:"発信主義",                      r:"はっしんしゅぎ",                           s:"民法" },
+  { k:"代理",                          r:"だいり",                                   s:"民法" },
+  { k:"顕名",                          r:"けんめい",                                 s:"民法" },
+  { k:"復代理",                        r:"ふくだいり",                               s:"民法" },
+  { k:"任意代理",                      r:"にんいだいり",                             s:"民法" },
+  { k:"代理権の濫用",                  r:"だいりけんのらんよう",                     s:"民法" },
+  { k:"自己契約",                      r:"じこけいやく",                             s:"民法" },
+  { k:"双方代理",                      r:"そうほうだいり",                           s:"民法" },
+  { k:"催告",                          r:"さいこく",                                 s:"民法" },
+  { k:"追認",                          r:"ついにん",                                 s:"民法" },
+  { k:"追認拒絶",                      r:"ついにんきょぜつ",                         s:"民法" },
+  { k:"過失責任主義",                  r:"かしつせきにんしゅぎ",                     s:"民法" },
+  { k:"無過失責任",                    r:"むかしつせきにん",                         s:"民法" },
+  { k:"取消",                          r:"とりけし",                                 s:"民法" },
+  { k:"原状回復義務",                  r:"げんじょうかいふくぎむ",                   s:"民法" },
+  { k:"期限",                          r:"きげん",                                   s:"民法" },
+  { k:"停止条件",                      r:"ていじじょうけん",                         s:"民法" },
+  { k:"解除条件",                      r:"かいじょじょうけん",                       s:"民法" },
+  { k:"時効の更新",                    r:"じこうのこうしん",                         s:"民法" },
+  { k:"時効の完成猶予",                r:"じこうのかんせいゆうよ",                   s:"民法" },
+  { k:"所有権",                        r:"しょゆうけん",                             s:"民法" },
+  { k:"占有権",                        r:"せんゆうけん",                             s:"民法" },
+  { k:"占有",                          r:"せんゆう",                                 s:"民法" },
+  { k:"物権",                          r:"ぶっけん",                                 s:"民法" },
+  { k:"混同",                          r:"こんどう",                                 s:"民法" },
+  { k:"代理占有",                      r:"だいりせんゆう",                           s:"民法" },
+  { k:"現実の引渡し",                  r:"げんじつのひきわたし",                     s:"民法" },
+  { k:"簡易の引渡し",                  r:"かんいのひきわたし",                       s:"民法" },
+  { k:"占有改定",                      r:"せんゆうかいてい",                         s:"民法" },
+  { k:"指図による占有移転",            r:"さしずによるせんゆいいてん",               s:"民法" },
+  { k:"占有保持の訴え",                r:"せんゆうほじのうったえ",                   s:"民法" },
+  { k:"占有回収の訴え",                r:"せんゆうかいしゅうのうったえ",             s:"民法" },
+  { k:"占有保全の訴え",                r:"せんゆうほぜんのうったえ",                 s:"民法" },
+  { k:"妨害排除請求権",                r:"ぼうがいはいじょせいきゅうけん",           s:"民法" },
+  { k:"返還請求権",                    r:"へんかんせいきゅうけん",                   s:"民法" },
+  { k:"土地収去明渡請求権",            r:"とちしゅうきょあけわたさせいきゅうけん",   s:"民法" },
+  { k:"建物明渡請求権",                r:"たてものあけわたさせいきゅうけん",         s:"民法" },
+  { k:"隣地通行権",                    r:"りんちつうこうけん",                       s:"民法" },
+  { k:"付合",                          r:"ふごう",                                   s:"民法" },
+  { k:"混和",                          r:"こんわ",                                   s:"民法" },
+  { k:"加工",                          r:"かこう",                                   s:"民法" },
+  { k:"共有",                          r:"きょうゆう",                               s:"民法" },
+  { k:"地上権",                        r:"ちじょうけん",                             s:"民法" },
+  { k:"相隣関係",                      r:"そうりんかんけい",                         s:"民法" },
+  { k:"永小作権",                      r:"えいこさくけん",                           s:"民法" },
+  { k:"地役権",                        r:"ちえきけん",                               s:"民法" },
+  { k:"承役地",                        r:"しょうえきち",                             s:"民法" },
+  { k:"先取特権",                      r:"さきどりとっけん",                         s:"民法" },
+  { k:"随伴性",                        r:"ずいはんせい",                             s:"民法" },
+  { k:"付従性",                        r:"ふじゅうせい",                             s:"民法" },
+  { k:"抵当権",                        r:"ていとうけん",                             s:"民法" },
+  { k:"質権",                          r:"しちけん",                                 s:"民法" },
+  { k:"付加一体物",                    r:"ふかいったいぶつ",                         s:"民法" },
+  { k:"代価弁済",                      r:"だいかべんさい",                           s:"民法" },
+  { k:"共同抵当",                      r:"きょうどうていとう",                       s:"民法" },
+  { k:"元本",                          r:"がんぽん",                                 s:"民法" },
+  { k:"極度額",                        r:"きょくどがく",                             s:"民法" },
+  { k:"種類債権",                      r:"しゅるいさいけん",                         s:"民法" },
+  { k:"特定物債権",                    r:"とくていぶつさいけん",                     s:"民法" },
+  { k:"履行期",                        r:"りこうき",                                 s:"民法" },
+  { k:"履行不能",                      r:"りこうふのう",                             s:"民法" },
+  { k:"履行遅滞",                      r:"りこうちたい",                             s:"民法" },
+  { k:"受領遅滞",                      r:"じゅりょうちたい",                         s:"民法" },
+  { k:"受領義務",                      r:"じゅりょうぎむ",                           s:"民法" },
+  { k:"強制執行",                      r:"きょうせいしっこう",                       s:"民法" },
+  { k:"債務不履行に基づく損害賠償請求",r:"さいむふりこうにもとづくそんがいばいしょうせいきゅう", s:"民法" },
+  { k:"相当因果関係",                  r:"そうとういんがかんけい",                   s:"民法" },
+  { k:"過失相殺",                      r:"かしつそうさい",                           s:"民法" },
+  { k:"代償請求権",                    r:"だいしょうせいきゅうけん",                 s:"民法" },
+  { k:"債権者代位",                    r:"さいけんしゃだいい",                       s:"民法" },
+  { k:"過大な代物弁済",                r:"かだいなだいぶつべんさい",                 s:"民法" },
+  { k:"偏頗行為",                      r:"へんぱこうい",                             s:"民法" },
+  { k:"詐害行為取消請求",              r:"さがいこういとりけしせいきゅう",           s:"民法" },
+  { k:"転得者",                        r:"てんとくしゃ",                             s:"民法" },
+  { k:"受益者",                        r:"じゅえきしゃ",                             s:"民法" },
+  { k:"分割債権",                      r:"ぶんかつさいけん",                         s:"民法" },
+  { k:"分割債務",                      r:"ぶんかつさいむ",                           s:"民法" },
+  { k:"不可分債権",                    r:"ふかぶんさいけん",                         s:"民法" },
+  { k:"不可分債務",                    r:"ふかぶんさいむ",                           s:"民法" },
+  { k:"連帯債権",                      r:"れんたいさいけん",                         s:"民法" },
+  { k:"相対効",                        r:"そうたいこう",                             s:"民法" },
+  { k:"絶対効",                        r:"ぜったいこう",                             s:"民法" },
+  { k:"求償",                          r:"きゅうしょう",                             s:"民法" },
+  { k:"保証債務",                      r:"ほしょうさいむ",                           s:"民法" },
+  { k:"保証人",                        r:"ほしょうにん",                             s:"民法" },
+  { k:"担保",                          r:"たんぽ",                                   s:"民法" },
+  { k:"事前求償権",                    r:"じぜんきゅうしょうけん",                   s:"民法" },
+  { k:"公正証書",                      r:"こうせいしょうしょ",                       s:"民法" },
+  { k:"債権譲渡禁止特約",              r:"さいけんじょうときんしとくやく",           s:"民法" },
+  { k:"対抗要件",                      r:"たいこうようけん",                         s:"民法" },
+  { k:"将来債権",                      r:"しょうらいさいけん",                       s:"民法" },
+  { k:"譲渡担保",                      r:"じょうとたんぽ",                           s:"民法" },
+  { k:"所有権留保",                    r:"しょゆうけんりゅうほ",                     s:"民法" },
+  { k:"仮登記担保",                    r:"かりとうきたんぽ",                         s:"民法" },
+  { k:"並存的債務引受",                r:"へいそんてきさいむひきうけ",               s:"民法" },
+  { k:"弁済",                          r:"べんさい",                                 s:"民法" },
+  { k:"第三者弁済",                    r:"だいさんしゃべんさい",                     s:"民法" },
+  { k:"代物弁済",                      r:"だいぶつべんさい",                         s:"民法" },
+  { k:"弁済充当",                      r:"べんさいじゅうとう",                       s:"民法" },
+  { k:"供託",                          r:"きょうたく",                               s:"民法" },
+  { k:"相殺適状",                      r:"そうさいてきじょう",                       s:"民法" },
+  { k:"差押え",                        r:"さしおさえ",                               s:"民法" },
+  { k:"更改",                          r:"こうかい",                                 s:"民法" },
+  { k:"債務免除",                      r:"さいむめんじょ",                           s:"民法" },
+  { k:"債務免除の意思表示",            r:"さいむめんじょのいしひょうじ",             s:"民法" },
+  { k:"契約自由の原則",                r:"けいやくじゆうのげんそく",                 s:"民法" },
+  { k:"申込み",                        r:"もうしこみ",                               s:"民法" },
+  { k:"承諾",                          r:"しょうだく",                               s:"民法" },
+  { k:"同時履行の抗弁権",              r:"どうじりこうのこうべんけん",               s:"民法" },
+  { k:"債務者主義",                    r:"さいむしゃしゅぎ",                         s:"民法" },
+  { k:"第三者のためにする契約",        r:"だいさんしゃのためにするけいやく",         s:"民法" },
+  { k:"契約上の地位の移転",            r:"けいやくじょうのちいのいてん",             s:"民法" },
+  { k:"解除",                          r:"かいじょ",                                 s:"民法" },
+  { k:"催告解除",                      r:"さいこくかいじょ",                         s:"民法" },
+  { k:"無催告解除",                    r:"むさいこくかいじょ",                       s:"民法" },
+  { k:"定型約款",                      r:"ていけいやっかん",                         s:"民法" },
+  { k:"贈与",                          r:"ぞうよ",                                   s:"民法" },
+  { k:"贈与契約",                      r:"ぞうよけいやく",                           s:"民法" },
+  { k:"書面によらない贈与",            r:"しょめんによらないぞうよ",                 s:"民法" },
+  { k:"負担付贈与",                    r:"ふたんつきぞうよ",                         s:"民法" },
+  { k:"死因贈与",                      r:"しいんぞうよ",                             s:"民法" },
+  { k:"売買",                          r:"ばいばい",                                 s:"民法" },
+  { k:"売買契約",                      r:"ばいばいけいやく",                         s:"民法" },
+  { k:"売買の予約",                    r:"ばいばいのよやく",                         s:"民法" },
+  { k:"手付",                          r:"てつけ",                                   s:"民法" },
+  { k:"追完",                          r:"ついいん",                                 s:"民法" },
+  { k:"追完請求権",                    r:"ついいんせいきゅうけん",                   s:"民法" },
+  { k:"代金減額請求権",                r:"だいきんげんがくせいきゅうけん",           s:"民法" },
+  { k:"債務不履行解除",                r:"さいむふりこうかいじょ",                   s:"民法" },
+  { k:"買戻し特約",                    r:"かいもどしとくやく",                       s:"民法" },
+  { k:"交換契約",                      r:"こうかんけいやく",                         s:"民法" },
+  { k:"消費貸借",                      r:"しょうひたいしゃく",                       s:"民法" },
+  { k:"金銭消費貸借",                  r:"きんせんしょうひたいしゃく",               s:"民法" },
+  { k:"消費貸借契約",                  r:"しょうひたいしゃくけいやく",               s:"民法" },
+  { k:"金銭消費貸借契約",              r:"きんせんしょうひたいしゃくけいやく",       s:"民法" },
+  { k:"利息",                          r:"りそく",                                   s:"民法" },
+  { k:"使用貸借",                      r:"しようたいしゃく",                         s:"民法" },
+  { k:"使用貸借契約",                  r:"しようたいしゃくけいやく",                 s:"民法" },
+  { k:"貸主",                          r:"かしぬし",                                 s:"民法" },
+  { k:"借主",                          r:"かりぬし",                                 s:"民法" },
+  { k:"賃貸人",                        r:"ちんたいにん",                             s:"民法" },
+  { k:"賃借人",                        r:"ちんしゃくにん",                           s:"民法" },
+  { k:"転借人",                        r:"てんしゃくにん",                           s:"民法" },
+  { k:"賃貸借",                        r:"ちんたいしゃく",                           s:"民法" },
+  { k:"賃貸借契約",                    r:"ちんたいしゃくけいやく",                   s:"民法" },
+  { k:"修繕義務",                      r:"しゅうぜんぎむ",                           s:"民法" },
+  { k:"転貸",                          r:"てんたい",                                 s:"民法" },
+  { k:"無断転貸",                      r:"むだんてんたい",                           s:"民法" },
+  { k:"敷金",                          r:"しききん",                                 s:"民法" },
+  { k:"賃料",                          r:"ちんりょう",                               s:"民法" },
+  { k:"雇用",                          r:"こよう",                                   s:"民法" },
+  { k:"雇用契約",                      r:"こようけいやく",                           s:"民法" },
+  { k:"請負",                          r:"うけおい",                                 s:"民法" },
+  { k:"請負契約",                      r:"うけおいけいやく",                         s:"民法" },
+  { k:"委任",                          r:"いにん",                                   s:"民法" },
+  { k:"委任契約",                      r:"いにんけいやく",                           s:"民法" },
+  { k:"準委任",                        r:"じゅんいにん",                             s:"民法" },
+  { k:"寄託",                          r:"きたく",                                   s:"民法" },
+  { k:"寄託契約",                      r:"きたくけいやく",                           s:"民法" },
+  { k:"消費寄託",                      r:"しょうひきたく",                           s:"民法" },
+  { k:"組合",                          r:"くみあい",                                 s:"民法" },
+  { k:"組合契約",                      r:"くみあいけいやく",                         s:"民法" },
+  { k:"事務管理",                      r:"じむかんり",                               s:"民法" },
+  { k:"準事務管理",                    r:"じゅんじむかんり",                         s:"民法" },
+  { k:"本人のためにする意思",          r:"ほんにんのためにするいし",                 s:"民法" },
+  { k:"不法原因給付",                  r:"ふほうげんいんきゅうふ",                   s:"民法" },
+  { k:"使用者責任",                    r:"しようしゃせきにん",                       s:"民法" },
+  { k:"慰謝料",                        r:"いしゃりょう",                             s:"民法" },
+  { k:"不法行為に基づく損害賠償請求",  r:"ふほうこういにもとづくそんがいばいしょうせいきゅう", s:"民法" },
+  { k:"過失",                          r:"かしつ",                                   s:"民法" },
+  { k:"精神的損害",                    r:"せいしんてきそんがい",                     s:"民法" },
+  { k:"責任能力",                      r:"せきにんのうりょく",                       s:"民法" },
+  { k:"共同不法行為",                  r:"きょうどうふほうこうい",                   s:"民法" },
+  { k:"親族",                          r:"しんぞく",                                 s:"民法" },
+  { k:"血族",                          r:"けつぞく",                                 s:"民法" },
+  { k:"姻族",                          r:"いんぞく",                                 s:"民法" },
+  { k:"配偶者",                        r:"はいぐうしゃ",                             s:"民法" },
+  { k:"親等",                          r:"しんとう",                                 s:"民法" },
+  { k:"婚姻",                          r:"こんいん",                                 s:"民法" },
+  { k:"重婚",                          r:"じゅうこん",                               s:"民法" },
+  { k:"届出",                          r:"とどけいで",                               s:"民法" },
+  { k:"氏",                            r:"うじ",                                     s:"民法" },
+  { k:"夫婦",                          r:"ふうふ",                                   s:"民法" },
+  { k:"協議離婚",                      r:"きょうぎりこん",                           s:"民法" },
+  { k:"裁判離婚",                      r:"さいばんりこん",                           s:"民法" },
+  { k:"子",                            r:"こ",                                       s:"民法" },
+  { k:"親",                            r:"おや",                                     s:"民法" },
+  { k:"財産分与",                      r:"ざいさんぶんよ",                           s:"民法" },
+  { k:"内縁",                          r:"ないえん",                                 s:"民法" },
+  { k:"準婚理論",                      r:"じゅんこんりろん",                         s:"民法" },
+  { k:"嫡出",                          r:"ちゃくしゅつ",                             s:"民法" },
+  { k:"嫡出推定",                      r:"ちゃくしゅつついてい",                     s:"民法" },
+  { k:"推定の及ばない子",              r:"ついていのおよばないこ",                   s:"民法" },
+  { k:"非嫡出子",                      r:"ひちゃくしゅつし",                         s:"民法" },
+  { k:"父を定めることを目的とする訴え",r:"ちちをさだめることをもくてきとするうったえ", s:"民法" },
+  { k:"嫡出否認",                      r:"ちゃくしゅつひにん",                       s:"民法" },
+  { k:"出訴期間",                      r:"しゅっそきかん",                           s:"民法" },
+  { k:"認知",                          r:"にんち",                                   s:"民法" },
+  { k:"準正",                          r:"じゅんせい",                               s:"民法" },
+  { k:"実子",                          r:"じっし",                                   s:"民法" },
+  { k:"養子",                          r:"ようし",                                   s:"民法" },
+  { k:"普通養子縁組",                  r:"ふつうようしえんぐみ",                     s:"民法" },
+  { k:"特別養子縁組",                  r:"とくべつようしえんぐみ",                   s:"民法" },
+  { k:"協議離縁",                      r:"きょうぎりえん",                           s:"民法" },
+  { k:"裁判離縁",                      r:"さいばんりえん",                           s:"民法" },
+  { k:"親権",                          r:"しんけん",                                 s:"民法" },
+  { k:"監護者",                        r:"かんごしゃ",                               s:"民法" },
+  { k:"利益相反行為",                  r:"りえきそうはんこうい",                     s:"民法" },
+  { k:"善管注意義務",                  r:"ぜんかんちゅういぎむ",                     s:"民法" },
+  { k:"自己の物と同一の注意義務",      r:"じこのものとどういつのちゅういぎむ",       s:"民法" },
+  { k:"親権の喪失",                    r:"しんけんのそうしつ",                       s:"民法" },
+  { k:"親権の停止",                    r:"しんけんのていし",                         s:"民法" },
+  { k:"相続人",                        r:"そうぞくにん",                             s:"民法" },
+  { k:"尊属",                          r:"そんぞく",                                 s:"民法" },
+  { k:"廃除",                          r:"はいじょ",                                 s:"民法" },
+  { k:"共同相続",                      r:"きょうどうそうぞく",                       s:"民法" },
+  { k:"法定相続分",                    r:"ほうていそうぞくぶん",                     s:"民法" },
+  { k:"遺言",                          r:"いごん",                                   s:"民法" },
+  { k:"代襲相続",                      r:"だいしゅうそうぞく",                       s:"民法" },
+  { k:"特別受益者",                    r:"とくべつじゅえきしゃ",                     s:"民法" },
+  { k:"寄与分",                        r:"きよぶん",                                 s:"民法" },
+  { k:"特別の寄与",                    r:"とくべつのきよ",                           s:"民法" },
+  { k:"限定承認",                      r:"げんていしょうにん",                       s:"民法" },
+  { k:"相続放棄",                      r:"そうぞくほうき",                           s:"民法" },
+  { k:"単純承認",                      r:"たんじゅんしょうにん",                     s:"民法" },
+  { k:"熟慮期間",                      r:"じゅくりょきかん",                         s:"民法" },
+  { k:"包括遺贈",                      r:"ほうかついぞう",                           s:"民法" },
+  { k:"特定遺贈",                      r:"とくていいぞう",                           s:"民法" },
+  { k:"自筆証書遺言",                  r:"じひつしょうしょいごん",                   s:"民法" },
+  { k:"公正証書遺言",                  r:"こうせいしょうしょいごん",                 s:"民法" },
+  { k:"秘密証書遺言",                  r:"ひみつしょうしょいごん",                   s:"民法" },
+  { k:"死亡",                          r:"しぼう",                                   s:"民法" },
+  { k:"遺言執行者",                    r:"いごんしっこうしゃ",                       s:"民法" },
+  { k:"無効",                          r:"むこう",                                   s:"民法" },
+  { k:"短期配偶者居住権",              r:"たんきはいぐうしゃきょじゅうけん",         s:"民法" },
+  { k:"遺留分",                        r:"いりゅうぶん",                             s:"民法" },
+  { k:"遺留分侵害額請求権",            r:"いりゅうぶんしんがいがくせいきゅうけん",   s:"民法" },
+
+
+  // 会社法
+  { k:"会社分割",                      r:"かいしゃぶんかつ",                         s:"会社法" },
+  { k:"取締役会",                      r:"とりしまりやくかい",                       s:"会社法" },
+  { k:"株主総会",                      r:"かぶぬしそうかい",                         s:"会社法" },
+  { k:"剰余金配当",                    r:"じょうよきんはいとう",                     s:"会社法" },
+  { k:"特別利害関係人",                r:"とくべつりがいかんけいにん",               s:"会社法" },
+  { k:"忠実義務",                      r:"ちゅうじつぎむ",                           s:"会社法" },
+  { k:"株主代表訴訟",                  r:"かぶぬしだいひょうそしょう",               s:"会社法" },
+  { k:"募集株式の発行",                r:"ぼしゅうかぶしきのはっこう",               s:"会社法" },
+  { k:"経営判断原則",                r:"けいえいはんだんげんそく",               s:"会社法" },
+  { k:"新株予約権",                    r:"しんかぶよやくけん",                       s:"会社法" },
+  { k:"表見代表取締役",                r:"ひょうけんだいひょうとりしまりやく",       s:"会社法" },
+  { k:"事後設立",                      r:"じごせつりつ",                             s:"会社法" },
+  { k:"利益供与",                r:"りえききょうよ",                   s:"会社法" },
+  { k:"発起設立", r:"ほっきせつりつ", s:"会社法" },
+  { k:"募集設立", r:"ぼしゅうせつりつ", s:"会社法" },
+  { k:"発起人", r:"ほっきにん", s:"会社法" },
+  { k:"定款", r:"ていかん", s:"会社法" },
+  { k:"資本金", r:"しほんきん", s:"会社法" },
+  { k:"授権資本", r:"じゅけんしほん", s:"会社法" },
+  { k:"株式譲渡自由の原則", r:"かぶしきじょうとじゆうのげんそく", s:"会社法" },
+  { k:"譲渡制限株式", r:"じょうとせいげんかぶしき", s:"会社法" },
+  { k:"種類株式", r:"しゅるいかぶしき", s:"会社法" },
+  { k:"自己株式", r:"じこかぶしき", s:"会社法" },
+  { k:"単元株", r:"たんげんかぶ", s:"会社法" },
+  { k:"株式併合", r:"かぶしきへいごう", s:"会社法" },
+  { k:"株式分割", r:"かぶしきぶんかつ", s:"会社法" },
+  { k:"名義書換", r:"めいぎかきかえ", s:"会社法" },
+  { k:"株主平等原則", r:"かぶぬしびょうどうげんそく", s:"会社法" },
+  { k:"株主提案権", r:"かぶぬしていあんけん", s:"会社法" },
+  { k:"議決権", r:"ぎけつけん", s:"会社法" },
+  { k:"累積投票", r:"るいせきとうひょう", s:"会社法" },
+  { k:"招集通知", r:"しょうしゅうつうち", s:"会社法" },
+  { k:"総会屋", r:"そうかいや", s:"会社法" },
+  { k:"取締役", r:"とりしまりやく", s:"会社法" },
+  { k:"代表取締役", r:"だいひょうとりしまりやく", s:"会社法" },
+  { k:"社外取締役", r:"しゃがいとりしまりやく", s:"会社法" },
+  { k:"監査役", r:"かんさやく", s:"会社法" },
+  { k:"監査役会", r:"かんさやくかい", s:"会社法" },
+  { k:"会計監査人", r:"かいけいかんさにん", s:"会社法" },
+  { k:"指名委員会等設置会社", r:"しめいいいんかいとうせっちがいしゃ", s:"会社法" },
+  { k:"監査等委員会設置会社", r:"かんさとういいんかいせっちがいしゃ", s:"会社法" },
+  { k:"執行役", r:"しっこうやく", s:"会社法" },
+  { k:"利益相反取引", r:"りえきそうはんとりひき", s:"会社法" },
+  { k:"お手盛り", r:"おてもり", s:"会社法" },
+  { k:"内部統制システム", r:"ないぶとうせいしすてむ", s:"会社法" },
+  { k:"責任限定契約", r:"せきにんげんていけいやく", s:"会社法" },
+  { k:"株主総会決議取消しの訴え", r:"かぶぬしそうかいけつぎとりけしのうったえ", s:"会社法" },
+  { k:"株主決議無効確認の訴え", r:"けつぎむこうかくにんのうったえ", s:"会社法" },
+  { k:"株主決議不存在確認の訴え", r:"けつぎふそんざいかくにんのうったえ", s:"会社法" },
+  { k:"違法行為差止請求", r:"いほうこういさしとめせいきゅう", s:"会社法" },
+  { k:"多重代表訴訟", r:"たじゅうだいひょうそしょう", s:"会社法" },
+  { k:"見せ金", r:"みせがね", s:"会社法" },
+  { k:"預合い", r:"あずけあい", s:"会社法" },
+  { k:"現物出資", r:"げんぶつしゅっし", s:"会社法" },
+  { k:"財産引受け", r:"ざいさんひきうけ", s:"会社法" },
+  { k:"社債", r:"しゃさい", s:"会社法" },
+  { k:"合併", r:"がっぺい", s:"会社法" },
+  { k:"吸収合併", r:"きゅうしゅうがっぺい", s:"会社法" },
+  { k:"新設合併", r:"しんせつがっぺい", s:"会社法" },
+  { k:"株式交換", r:"かぶしきこうかん", s:"会社法" },
+  { k:"株式移転", r:"かぶしきいてん", s:"会社法" },
+  { k:"事業譲渡", r:"じぎょうじょうと", s:"会社法" },
+  { k:"反対株主の株式買取請求権", r:"はんたいかぶぬしのかぶしきかいとりせいきゅうけん", s:"会社法" },
+  { k:"特別支配株主", r:"とくべつしはいかぶぬし", s:"会社法" },
+  { k:"全部取得条項付種類株式", r:"ぜんぶしゅとくじょうこうつきしゅるいかぶしき", s:"会社法" },
+  { k:"支配人", r:"しはいにん", s:"会社法" },
+  { k:"表見支配人", r:"ひょうけんしはいにん", s:"会社法" },
+  { k:"競業避止義務", r:"きょうぎょうひしぎむ", s:"会社法" },
+  { k:"株式会社", r:"かぶしきがいしゃ", s:"会社法" },
+  { k:"持分会社", r:"もちぶんがいしゃ", s:"会社法" },
+  { k:"合名会社", r:"ごうめいがいしゃ", s:"会社法" },
+  { k:"合資会社", r:"ごうしがいしゃ", s:"会社法" },
+  { k:"合同会社", r:"ごうどうがいしゃ", s:"会社法" },
+  { k:"定款自治", r:"ていかんじち", s:"会社法" },
+  { k:"絶対的記載事項", r:"ぜったいてききさいじこう", s:"会社法" },
+  { k:"相対的記載事項", r:"そうたいてききさいじこう", s:"会社法" },
+  { k:"任意的記載事項", r:"にんいてききさいじこう", s:"会社法" },
+  { k:"設立無効の訴え", r:"せつりつむこうのうったえ", s:"会社法" },
+  { k:"株券", r:"かぶけん", s:"会社法" },
+  { k:"株主名簿", r:"かぶぬしめいぼ", s:"会社法" },
+  { k:"基準日", r:"きじゅんび", s:"会社法" },
+  { k:"株式の共有", r:"かぶしきのきょうゆう", s:"会社法" },
+  { k:"有利発行", r:"ゆうりはっこう", s:"会社法" },
+  { k:"検査役", r:"けんさやく", s:"会社法" },
+  { k:"仮装払込み", r:"かそうはらいこみ", s:"会社法" },
+  { k:"資本充実の原則", r:"しほんじゅうじつのげんそく", s:"会社法" },
+  { k:"資本維持の原則", r:"しほんいじのげんそく", s:"会社法" },
+  { k:"資本不変の原則", r:"しほんふへんのげんそく", s:"会社法" },
+  { k:"準備金", r:"じゅんびきん", s:"会社法" },
+  { k:"分配可能額", r:"ぶんぱいかのうがく", s:"会社法" },
+  { k:"違法配当", r:"いほうはいとう", s:"会社法" },
+  { k:"任務懈怠責任", r:"にんむけたいせきにん", s:"会社法" },
+  { k:"特別決議", r:"とくべつけつぎ", s:"会社法" },
+  { k:"特殊決議", r:"とくしゅけつぎ", s:"会社法" },
+  { k:"普通決議", r:"ふつうけつぎ", s:"会社法" },
+  { k:"議決権の代理行使", r:"ぎけつけんのだいりこうし", s:"会社法" },
+  { k:"書面投票", r:"しょめんとうひょう", s:"会社法" },
+  { k:"会計参与", r:"かいけいさんよ", s:"会社法" },
+  { k:"大会社", r:"だいがいしゃ", s:"会社法" },
+  { k:"公開会社", r:"こうかいがいしゃ", s:"会社法" },
+  { k:"非公開会社", r:"ひこうかいがいしゃ", s:"会社法" },
+  { k:"種類株主総会", r:"しゅるいかぶぬしそうかい", s:"会社法" },
+  { k:"拒否権付株式", r:"きょひけんつきかぶしき", s:"会社法" },
+  { k:"簡易合併", r:"かんいがっぺい", s:"会社法" },
+  { k:"略式合併", r:"りゃくしきがっぺい", s:"会社法" },
+  { k:"債権者保護手続", r:"さいけんしゃほごてつづき", s:"会社法" },
+  { k: "善管注意義務", r: "ぜんかんちゅういぎむ", s: "会社法" },
+  { k: "忠実義務", r: "ちゅうじつぎむ", s: "会社法" },
+  { k: "利益相反取引", r: "りえきそうはんとりひき", s: "会社法" },
+  { k: "競業取引", r: "きょうぎょうとりひき", s: "会社法" },
+  { k: "詐害的会社分割", r: "さがいてきかいしゃぶんかつ", s: "会社法" },
+  { k: "買収防衛策", r: "ばいしゅうぼうえいさく", s: "会社法" },
+  { k: "代表取締役", r: "だいひょうとりしまりやく", s: "会社法" },
+  { k: "一人会社", r: "いちにんがいしゃ", s: "会社法" },
+  { k: "委任状勧誘", r: "いにんじょうかんゆう", s: "会社法" },
+  { k: "お手盛り", r: "おてもり", s: "会社法" },
+  { k: "開業準備行為", r: "かいぎょうじゅんびこうい", s: "会社法" },
+  { k: "会計帳簿閲覧権", r: "かいけいちょうぼえつらんけん", s: "会社法" },
+  { k: "監査役会", r: "かんさやくかい", s: "会社法" },
+  { k: "コーポレートガバナンス", r: "こーぽれーとがばなんす", s: "会社法" },
+  { k: "キャッシュアウト", r: "きゃっしゅあうと", s: "会社法" },
+  { k: "強圧性", r: "きょうあつせい", s: "会社法" },
+  { k: "競業避止義務", r: "きょうぎょうひしぎむ", s: "会社法" },
+  { k: "欠損", r: "けっそん", s: "会社法" },
+  { k: "欠損填補責任", r: "けっそんてんぽせきにん", s: "会社法" },
+  { k: "公開買付け", r: "こうかいかいつけ", s: "会社法" },
+  { k: "裁量棄却", r: "さいりょうききゃく", s: "会社法" },
+  { k: "ナカリセバ価格", r: "なかりせばかかく", s: "会社法" },
+  { k: "従業員持株制度", r: "じゅうぎょういんもちかぶせいど", s: "会社法" },
+  { k: "主要目的ルール", r: "しゅようもくてきるーる", s: "会社法" },
+  { k: "剰余金の配当", r: "じょうよきんのはいとう", s: "会社法" },
+  { k: "第三者割当て", r: "だいさんしゃわりあて", s: "会社法" },
+  { k: "増資", r: "ぞうし", s: "会社法" },
+  { k: "多重代表訴訟", r: "たじゅうだいひょうそしょう", s: "会社法" },
+  { k: "単元株制度", r: "たんげんかぶせいど", s: "会社法" },
+  { k: "単独株主権", r: "たんどくかぶぬしけん", s: "会社法" },
+  { k: "忠実義務", r: "ちゅうじつぎむ", s: "会社法" },
+  { k: "直接損害", r: "ちょくせつそんがい", s: "会社法" },
+  { k: "間接損害", r: "かんせつそんがい", s: "会社法" },
+  { k: "敵対的買収", r: "てきたいてきばいしゅう", s: "会社法" },
+  { k: "動議", r: "どうぎ", s: "会社法" },
+  { k: "特別決議", r: "とくべつけつぎ", s: "会社法" },
+  { k: "普通決議", r: "ふつうけつぎ", s: "会社法" },
+  { k: "独任制", r: "どくにんせい", s: "会社法" },
+  { k: "特別支配株主", r: "とくべつしはいかぶぬし", s: "会社法" },
+  { k: "取締役", r: "とりしまりやく", s: "会社法" },
+  { k: "任期", r: "にんき", s: "会社法" },
+  { k: "取締役会", r: "とりしまりやくかい", s: "会社法" },
+  { k: "取締役会決議", r: "とりしまりやくかいけつぎ", s: "会社法" },
+  { k: "取締役会議事録", r: "とりしまりやくかいぎじろく", s: "会社法" },
+  { k: "取締役会の招集", r: "とりしまりやくかいのしょうしゅう", s: "会社法" },
+  { k: "取締役会設置会社", r: "とりしまりやくかいせっちがいしゃ", s: "会社法" },
+  { k: "名板貸", r: "ないたがし", s: "会社法" },
+  { k: "内部統制システム", r: "ないぶとうせいシステム", s: "会社法" },
+  { k: "ナカリセバ価格", r: "なかりせばかかく", s: "会社法" },
+  { k: "買収防衛策", r: "ばいしゅうぼうえいさく", s: "会社法" },
+  { k: "払込み", r: "はらいこみ", s: "会社法" },
+  { k: "振替株式", r: "ふりかえかぶしき", s: "会社法" },
+  { k: "分配可能額", r: "ぶんぱいかのうがく", s: "会社法" },
+  { k: "法人格否認の法理", r: "ほうじんかくひにんのほうり", s: "会社法" },
+  { k: "発起人", r: "ほっきにん", s: "会社法" },
+  { k: "発起人組合", r: "ほっきにんくみあい", s: "会社法" },
+  { k: "見せ金", r: "みせがね", s: "会社法" },
+  { k: "無限責任", r: "むげんせきにん", s: "会社法" },
+  { k: "名義書換え", r: "めいぎかきかえ", s: "会社法" },
+  { k: "名義書換えの不当拒絶", r: "めいぎかきかえのふとうきょぜつ", s: "会社法" },
+  { k: "持株会社", r: "もちかぶがいしゃ", s: "会社法" },
+  { k: "持分会社", r: "もちぶんがいしゃ", s: "会社法" },
+  { k: "役員", r: "やくいん", s: "会社法" },
+  { k: "役員等", r: "やくいんとう", s: "会社法" },
+  { k: "ライツ・プラン", r: "らいつ・ぷらん", s: "会社法" },
+  { k: "ポイズン・ピル", r: "ぽいずん・ぴる", s: "会社法" },
+  { k: "利益供与", r: "りえききょうよ", s: "会社法" },
+  { k: "略式組織再編", r: "りゃくしきそしきさいへん", s: "会社法" },
+  { k: "臨時株主総会", r: "りんじかぶぬしそうかい", s: "会社法" },
+  { k: "累積投票", r: "るいせきとうひょう", s: "会社法" },
+  { k: "連結計算書類", r: "れんけつけいさんしょるい", s: "会社法" },
+
+ 
+  // 民事訴訟法
+  { k:"二重起訴の禁止",                r:"にじゅうきそのきんし",                     s:"民事訴訟法" },
+  { k:"文書提出義務",                  r:"ぶんしょていしゅつぎむ",                   s:"民事訴訟法" },
+  { k:"独立当事者参加",                r:"どくりつとうじしゃさんか",                 s:"民事訴訟法" },
+  { k:"固有必要的共同訴訟",            r:"こゆうひつようてききょうどうそしょう",     s:"民事訴訟法" },
+  { k:"既判力",                        r:"きはんりょく",                             s:"民事訴訟法" },
+  { k:"弁論主義",                      r:"べんろんしゅぎ",                           s:"民事訴訟法" },
+  { k:"処分権主義",                    r:"しょぶんけんしゅぎ",                       s:"民事訴訟法" },
+  { k:"証明責任",                      r:"しょうめいせきにん",                       s:"民事訴訟法" },
+  { k:"自由心証主義",                  r:"じゆうしんしょうしゅぎ",                   s:"民事訴訟法" },
+  { k:"反訴",                          r:"はんそ",                                   s:"民事訴訟法" },
+  { k:"補助参加",                      r:"ほじょさんか",                             s:"民事訴訟法" },
+  { k:"主観的併合",                    r:"しゅかんてきへいごう",                     s:"民事訴訟法" },
+  { k:"訴訟上の和解",                  r:"そしょうじょうのわかい",                   s:"民事訴訟法" },
+  { k:"確定判決",                      r:"かくていはんけつ",                         s:"民事訴訟法" },
+  { k:"訴えの変更",                    r:"うったえのへんこう",                       s:"民事訴訟法" },
+  { k:"上告受理申立て",                r:"じょうこくじゅりもうしたて",               s:"民事訴訟法" },
+  { k:"争点整理手続",                  r:"そうてんせいりてつづき",                   s:"民事訴訟法" },
+  { k:"訴訟要件", r:"そしょうようけん", s:"民事訴訟法" },
+  { k:"当事者適格", r:"とうじしゃてきかく", s:"民事訴訟法" },
+  { k:"当事者能力", r:"とうじしゃのうりょく", s:"民事訴訟法" },
+  { k:"訴訟能力", r:"そしょうのうりょく", s:"民事訴訟法" },
+  { k:"管轄", r:"かんかつ", s:"民事訴訟法" },
+  { k:"専属管轄", r:"せんぞくかんかつ", s:"民事訴訟法" },
+  { k:"移送", r:"いそう", s:"民事訴訟法" },
+  { k:"訴訟物", r:"そしょうぶつ", s:"民事訴訟法" },
+  { k:"旧訴訟物理論", r:"きゅうそしょうぶつりろん", s:"民事訴訟法" },
+  { k:"新訴訟物理論", r:"しんそしょうぶつりろん", s:"民事訴訟法" },
+  { k:"給付の訴え", r:"きゅうふのうったえ", s:"民事訴訟法" },
+  { k:"確認の訴え", r:"かくにんのうったえ", s:"民事訴訟法" },
+  { k:"形成の訴え", r:"けいせいのうったえ", s:"民事訴訟法" },
+  { k:"将来給付の訴え", r:"しょうらいきゅうふのうったえ", s:"民事訴訟法" },
+  { k:"訴状", r:"そじょう", s:"民事訴訟法" },
+  { k:"送達", r:"そうたつ", s:"民事訴訟法" },
+  { k:"口頭弁論", r:"こうとうべんろん", s:"民事訴訟法" },
+  { k:"適時提出主義", r:"てきじていしゅつしゅぎ", s:"民事訴訟法" },
+  { k:"時機に後れた攻撃防御方法", r:"じきにおくれたこうげきぼうぎょほうほう", s:"民事訴訟法" },
+  { k:"釈明権", r:"しゃくめいけん", s:"民事訴訟法" },
+  { k:"釈明義務", r:"しゃくめいぎむ", s:"民事訴訟法" },
+  { k:"消極的釈明", r:"しょうきょくてきしゃくめい", s:"民事訴訟法" },
+  { k:"積極的釈明", r:"せっきょくてきしゃくめい", s:"民事訴訟法" },
+  { k:"自白", r:"じはく", s:"民事訴訟法" },
+  { k:"擬制自白", r:"ぎせいじはく", s:"民事訴訟法" },
+  { k:"権利自白", r:"けんりじはく", s:"民事訴訟法" },
+  { k:"証拠調べ", r:"しょうこしらべ", s:"民事訴訟法" },
+  { k:"当事者尋問", r:"とうじしゃじんもん", s:"民事訴訟法" },
+  { k:"書証", r:"しょしょう", s:"民事訴訟法" },
+  { k:"二段の推定", r:"にだんのすいてい", s:"民事訴訟法" },
+  { k:"証明度", r:"しょうめいど", s:"民事訴訟法" },
+  { k:"疎明", r:"そめい", s:"民事訴訟法" },
+  { k:"法律上の推定", r:"ほうりつじょうのすいてい", s:"民事訴訟法" },
+  { k:"既判力の客観的範囲", r:"きはんりょくのきゃっかんてきはんい", s:"民事訴訟法" },
+  { k:"既判力の時的限界", r:"きはんりょくのじてきげんかい", s:"民事訴訟法" },
+  { k:"争点効", r:"そうてんこう", s:"民事訴訟法" },
+  { k:"一部請求", r:"いちぶせいきゅう", s:"民事訴訟法" },
+  { k:"訴えの取下げ", r:"うったえのとりさげ", s:"民事訴訟法" },
+  { k:"請求の放棄", r:"せいきゅうのほうき", s:"民事訴訟法" },
+  { k:"請求の認諾", r:"せいきゅうのにんだく", s:"民事訴訟法" },
+  { k:"通常共同訴訟", r:"つうじょうきょうどうそしょう", s:"民事訴訟法" },
+  { k:"類似必要的共同訴訟", r:"るいじひつようてききょうどうそしょう", s:"民事訴訟法" },
+  { k:"訴訟参加", r:"そしょうさんか", s:"民事訴訟法" },
+  { k:"訴訟告知", r:"そしょうこくち", s:"民事訴訟法" },
+  { k:"訴訟承継", r:"そしょうしょうけい", s:"民事訴訟法" },
+  { k:"選定当事者", r:"せんていとうじしゃ", s:"民事訴訟法" },
+  { k:"既判力の主観的範囲", r:"きはんりょくのしゅかんてきはんい", s:"民事訴訟法" },
+  { k:"控訴審", r:"こうそしん", s:"民事訴訟法" },
+  { k:"不利益変更禁止の原則", r:"ふりえきへんこうきんしのげんそく", s:"民事訴訟法" },
+  { k:"上訴", r:"じょうそ", s:"民事訴訟法" },
+  { k:"少額訴訟", r:"しょうがくそしょう", s:"民事訴訟法" },
+  { k:"支払督促", r:"しはらいとくそく", s:"民事訴訟法" },
+  { k:"手形訴訟", r:"てがたそしょう", s:"民事訴訟法" },
+  { k:"民事保全", r:"みんじほぜん", s:"民事訴訟法" },
+  { k:"仮差押え", r:"かりさしおさえ", s:"民事訴訟法" },
+  { k:"仮処分", r:"かりしょぶん", s:"民事訴訟法" },
+  { k:"訴訟係属", r:"そしょうけいぞく", s:"民事訴訟法" },
+  { k:"訴訟代理人", r:"そしょうだいりにん", s:"民事訴訟法" },
+  { k:"法定代理人", r:"ほうていだいりにん", s:"民事訴訟法" },
+  { k:"当事者の確定", r:"とうじしゃのかくてい", s:"民事訴訟法" },
+  { k:"氏名冒用訴訟", r:"しめいぼうようそしょう", s:"民事訴訟法" },
+  { k:"死者名義訴訟", r:"ししゃめいぎそしょう", s:"民事訴訟法" },
+  { k:"客観的併合", r:"きゃっかんてきへいごう", s:"民事訴訟法" },
+  { k:"選択的併合", r:"せんたくてきへいごう", s:"民事訴訟法" },
+  { k:"予備的併合", r:"よびてきへいごう", s:"民事訴訟法" },
+  { k:"中間確認の訴え", r:"ちゅうかんかくにんのうったえ", s:"民事訴訟法" },
+  { k:"反射効", r:"はんしゃこう", s:"民事訴訟法" },
+  { k:"訴訟判決", r:"そしょうはんけつ", s:"民事訴訟法" },
+  { k:"本案判決", r:"ほんあんはんけつ", s:"民事訴訟法" },
+  { k:"中間判決", r:"ちゅうかんはんけつ", s:"民事訴訟法" },
+  { k:"一部判決", r:"いちぶはんけつ", s:"民事訴訟法" },
+  { k:"欠席判決", r:"けっせきはんけつ", s:"民事訴訟法" },
+  { k:"形成力", r:"けいせいりょく", s:"民事訴訟法" },
+  { k:"執行力", r:"しっこうりょく", s:"民事訴訟法" },
+  { k:"参加的効力", r:"さんかてきこうりょく", s:"民事訴訟法" },
+  { k:"補助参加の利益", r:"ほじょさんかのりえき", s:"民事訴訟法" },
+  { k:"共同訴訟参加", r:"きょうどうそしょうさんか", s:"民事訴訟法" },
+  { k:"共同訴訟的補助参加", r:"きょうどうそしょうてきほじょさんか", s:"民事訴訟法" },
+  { k:"訴訟脱退", r:"そしょうだったい", s:"民事訴訟法" },
+  { k:"弁論の全趣旨", r:"べんろんのぜんしゅし", s:"民事訴訟法" },
+  { k:"自由な証明", r:"じゆうなしょうめい", s:"民事訴訟法" },
+  { k:"厳格な証明", r:"げんかくなしょうめい", s:"民事訴訟法" },
+  { k:"証拠保全", r:"しょうこほぜん", s:"民事訴訟法" },
+  { k:"証人義務", r:"しょうにんぎむ", s:"民事訴訟法" },
+  { k:"文書送付嘱託", r:"ぶんしょそうふしょくたく", s:"民事訴訟法" },
+  { k:"当事者照会", r:"とうじしゃしょうかい", s:"民事訴訟法" },
+  { k:"計画審理", r:"けいかくしんり", s:"民事訴訟法" },
+  { k:"弁論準備手続", r:"べんろんじゅんびてつづき", s:"民事訴訟法" },
+  { k:"進行協議期日", r:"しんこうきょうぎきじつ", s:"民事訴訟法" },
+  { k:"督促手続", r:"とくそくてつづき", s:"民事訴訟法" },
+  { k:"上告理由", r:"じょうこくりゆう", s:"民事訴訟法" },
+  { k:"再審事由", r:"さいしんじゆう", s:"民事訴訟法" },
+  { k:"相殺の抗弁", r:"そうさいのこうべん", s:"民事訴訟法" },
+
+  // 刑法
+  { k:"誤想防衛",                      r:"ごそうぼうえい",                           s:"刑法" },
+  { k:"公務執行妨害",                  r:"こうむしっこうぼうがい",                   s:"刑法" },
+  { k:"住居侵入",                      r:"じゅうきょしんにゅう",                     s:"刑法" },
+  { k:"賄賂罪",                        r:"わいろざい",                               s:"刑法" },
+  { k:"承継的共同正犯",                r:"しょうけいてききょうどうせいはん",         s:"刑法" },
+  { k:"正当防衛",                      r:"せいとうぼうえい",                         s:"刑法" },
+  { k:"緊急避難",                      r:"きんきゅうひなん",                         s:"刑法" },
+  { k:"罪刑法定主義",                  r:"ざいけいほうていしゅぎ",                   s:"刑法" },
+  { k:"因果関係",                      r:"いんがかんけい",                           s:"刑法" },
+  { k:"構成要件該当性",                r:"こうせいようけんがいとうせい",             s:"刑法" },
+  { k:"中止未遂",                      r:"ちゅうしみすい",                           s:"刑法" },
+  { k:"不能犯",                        r:"ふのうはん",                               s:"刑法" },
+  { k:"不真正不作為犯",                r:"ふしんせいふさくいはん",                   s:"刑法" },
+  { k:"事実の錯誤",                    r:"じじつのさくご",                           s:"刑法" },
+  { k:"共同正犯",                      r:"きょうどうせいはん",                       s:"刑法" },
+  { k:"教唆犯",                        r:"きょうさはん",                             s:"刑法" },
+  { k:"ほう助犯",                      r:"ほうじょはん",                             s:"刑法" },
+  { k:"横領罪",                        r:"おうりょうざい",                           s:"刑法" },
+  { k:"背任罪",                        r:"はいにんざい",                             s:"刑法" },
+  { k:"詐欺罪",                        r:"さぎざい",                                 s:"刑法" },
+  { k:"故意", r:"こい", s:"刑法" },
+  { k:"心神喪失", r:"しんしんそうしつ", s:"刑法" },
+  { k:"心神耗弱", r:"しんしんこうじゃく", s:"刑法" },
+  { k:"原因において自由な行為", r:"げんいんにおいてじゆうなこうい", s:"刑法" },
+  { k:"期待可能性", r:"きたいかのうせい", s:"刑法" },
+  { k:"違法性阻却事由", r:"いほうせいそきゃくじゆう", s:"刑法" },
+  { k:"責任阻却事由", r:"せきにんそきゃくじゆう", s:"刑法" },
+  { k:"法律の錯誤", r:"ほうりつのさくご", s:"刑法" },
+  { k:"抽象的事実の錯誤", r:"ちゅうしょうてきじじつのさくご", s:"刑法" },
+  { k:"具体的事実の錯誤", r:"ぐたいてきじじつのさくご", s:"刑法" },
+  { k:"過剰防衛", r:"かじょうぼうえい", s:"刑法" },
+  { k:"自救行為", r:"じきゅうこうい", s:"刑法" },
+  { k:"未遂犯", r:"みすいはん", s:"刑法" },
+  { k:"予備罪", r:"よびざい", s:"刑法" },
+  { k:"間接正犯", r:"かんせつせいはん", s:"刑法" },
+  { k:"共謀共同正犯", r:"きょうぼうきょうどうせいはん", s:"刑法" },
+  { k:"従犯", r:"じゅうはん", s:"刑法" },
+  { k:"罪数", r:"ざいすう", s:"刑法" },
+  { k:"観念的競合", r:"かんねんてききょうごう", s:"刑法" },
+  { k:"牽連犯", r:"けんれんはん", s:"刑法" },
+  { k:"包括一罪", r:"ほうかついちざい", s:"刑法" },
+  { k:"殺人罪", r:"さつじんざい", s:"刑法" },
+  { k:"傷害罪", r:"しょうがいざい", s:"刑法" },
+  { k:"傷害致死罪", r:"しょうがいちしざい", s:"刑法" },
+  { k:"暴行罪", r:"ぼうこうざい", s:"刑法" },
+  { k:"遺棄罪", r:"いきざい", s:"刑法" },
+  { k:"保護責任者遺棄罪", r:"ほごせきにんしゃいきざい", s:"刑法" },
+  { k:"逮捕監禁罪", r:"たいほかんきんざい", s:"刑法" },
+  { k:"脅迫罪", r:"きょうはくざい", s:"刑法" },
+  { k:"強要罪", r:"きょうようざい", s:"刑法" },
+  { k:"名誉毀損罪", r:"めいよきそんざい", s:"刑法" },
+  { k:"侮辱罪", r:"ぶじょくざい", s:"刑法" },
+  { k:"窃盗罪", r:"せっとうざい", s:"刑法" },
+  { k:"強盗罪", r:"ごうとうざい", s:"刑法" },
+  { k:"事後強盗罪", r:"じごごうとうざい", s:"刑法" },
+  { k:"強盗致傷罪", r:"ごうとうちしょうざい", s:"刑法" },
+  { k:"強盗致死罪", r:"ごうとうちしざい", s:"刑法" },
+  { k:"強盗殺人罪", r:"ごうとうさつじんざい", s:"刑法" },
+  { k:"恐喝罪", r:"きょうかつざい", s:"刑法" },
+  { k:"遺失物横領罪", r:"いしつぶつおうりょうざい", s:"刑法" },
+  { k:"器物損壊罪", r:"きぶつそんかいざい", s:"刑法" },
+  { k:"放火罪", r:"ほうかざい", s:"刑法" },
+  { k:"現住建造物等放火罪", r:"げんじゅうけんぞうぶつとうほうか", s:"刑法" },
+  { k:"文書偽造罪", r:"ぶんしょぎぞうざい", s:"刑法" },
+  { k:"通貨偽造罪", r:"つうかぎぞうざい", s:"刑法" },
+  { k:"偽証罪", r:"ぎしょうざい", s:"刑法" },
+  { k:"逃走罪", r:"とうそうざい", s:"刑法" },
+  { k:"犯人蔵匿罪", r:"はんにんぞうとくざい", s:"刑法" },
+  { k:"証拠隠滅罪", r:"しょうこいんめつざい", s:"刑法" },
+  { k:"収賄罪", r:"しゅうわいざい", s:"刑法" },
+  { k:"贈賄罪", r:"ぞうわいざい", s:"刑法" },
+  { k:"実行の着手", r:"じっこうのちゃくしゅ", s:"刑法" },
+  { k:"不作為犯", r:"ふさくいはん", s:"刑法" },
+  { k:"かすがい現象", r:"かすがいげんしょう", s:"刑法" },
+  { k:"実行行為", r:"じっこうこうい", s:"刑法" },
+  { k:"結果無価値", r:"けっかむかち", s:"刑法" },
+  { k:"行為無価値", r:"こういむかち", s:"刑法" },
+  { k:"保護法益", r:"ほごほうえき", s:"刑法" },
+  { k:"作為義務", r:"さくいぎむ", s:"刑法" },
+  { k:"因果関係の錯誤", r:"いんがかんけいのさくご", s:"刑法" },
+  { k:"相当因果関係説", r:"そうとういんがかんけいせつ", s:"刑法" },
+  { k:"危険の現実化", r:"きけんのげんじつか", s:"刑法" },
+  { k:"具体的符合説", r:"ぐたいてきふごうせつ", s:"刑法" },
+  { k:"法定的符合説", r:"ほうていてきふごうせつ", s:"刑法" },
+  { k:"抽象的符合説", r:"ちゅうしょうてきふごうせつ", s:"刑法" },
+  { k:"方法の錯誤", r:"ほうほうのさくご", s:"刑法" },
+  { k:"客体の錯誤", r:"きゃくたいのさくご", s:"刑法" },
+  { k:"誤想過剰防衛", r:"ごそうかじょうぼうえい", s:"刑法" },
+  { k:"正当行為", r:"せいとうこうい", s:"刑法" },
+  { k:"被害者の承諾", r:"ひがいしゃのしょうだく", s:"刑法" },
+  { k:"責任主義", r:"せきにんしゅぎ", s:"刑法" },
+  { k:"違法性の意識", r:"いほうせいのいしき", s:"刑法" },
+  { k:"中止犯", r:"ちゅうしはん", s:"刑法" },
+  { k:"共犯の従属性", r:"きょうはんのじゅうぞくせい", s:"刑法" },
+  { k:"共犯からの離脱", r:"きょうはんからのりだつ", s:"刑法" },
+  { k:"共犯と身分", r:"きょうはんとみぶん", s:"刑法" },
+  { k:"過失犯", r:"かしつはん", s:"刑法" },
+  { k:"結果的加重犯", r:"けっかてきかじゅうはん", s:"刑法" },
+  { k:"略取誘拐罪", r:"りゃくしゅゆうかいざい", s:"刑法" },
+  { k:"強制わいせつ罪", r:"きょうせいわいせつざい", s:"刑法" },
+  { k:"業務妨害罪", r:"ぎょうむぼうがいざい", s:"刑法" },
+  { k:"信用毀損罪", r:"しんようきそんざい", s:"刑法" },
+  { k:"不動産侵奪罪", r:"ふどうさんしんだつざい", s:"刑法" },
+  { k:"業務上横領罪", r:"ぎょうむじょうおうりょうざい", s:"刑法" },
+  { k:"盗品等関与罪", r:"とうひんとうかんよざい", s:"刑法" },
+
+  // 刑事訴訟法
+  { k:"伝聞法則",                      r:"でんぶんほうそく",                         s:"刑事訴訟法" },
+  { k:"接見交通権",                    r:"せっけんこうつうけん",                     s:"刑事訴訟法" },
+  { k:"別件逮捕",                      r:"べっけんたいほ",                           s:"刑事訴訟法" },
+  { k:"訴因変更",                      r:"そいんへんこう",                           s:"刑事訴訟法" },
+  { k:"違法収集証拠排除法則",          r:"いほうしゅうしゅうしょうこはいじほうそく", s:"刑事訴訟法" },
+  { k:"令状主義",                      r:"れいじょうしゅぎ",                         s:"刑事訴訟法" },
+  { k:"任意捜査",                      r:"にんいそうさ",                             s:"刑事訴訟法" },
+  { k:"強制捜査",                      r:"きょうせいそうさ",                         s:"刑事訴訟法" },
+  { k:"自白法則",                      r:"じはくほうそく",                           s:"刑事訴訟法" },
+  { k:"補強法則",                      r:"ほきょうほうそく",                         s:"刑事訴訟法" },
+  { k:"一事不再理",                    r:"いちじふさいり",                           s:"刑事訴訟法" },
+  { k:"勾留の要件",                    r:"こうりゅうのようけん",                     s:"刑事訴訟法" },
+  { k:"現行犯逮捕",                    r:"げんこうはんたいほ",                       s:"刑事訴訟法" },
+  { k:"再逮捕の禁止",                  r:"さいたいほのきんし",                       s:"刑事訴訟法" },
+  { k:"捜索差し押さえ",                r:"そうさくさしおさえ",                       s:"刑事訴訟法" },
+  { k:"弾劾証拠",                      r:"だんがいしょうこ",                         s:"刑事訴訟法" },
+  { k:"公訴事実の同一性",              r:"こうそじじつのどういつせい",               s:"刑事訴訟法" },
+  { k:"逮捕", r:"たいほ", s:"刑事訴訟法" },
+  { k:"通常逮捕", r:"つうじょうたいほ", s:"刑事訴訟法" },
+  { k:"緊急逮捕", r:"きんきゅうたいほ", s:"刑事訴訟法" },
+  { k:"勾留", r:"こうりゅう", s:"刑事訴訟法" },
+  { k:"逮捕前置主義", r:"たいほぜんちしゅぎ", s:"刑事訴訟法" },
+  { k:"職務質問", r:"しょくむしつもん", s:"刑事訴訟法" },
+  { k:"所持品検査", r:"しょじひんけんさ", s:"刑事訴訟法" },
+  { k:"自動車検問", r:"じどうしゃけんもん", s:"刑事訴訟法" },
+  { k:"おとり捜査", r:"おとりそうさ", s:"刑事訴訟法" },
+  { k:"任意同行", r:"にんいどうこう", s:"刑事訴訟法" },
+  { k:"逮捕に伴う捜索", r:"たいほにともなうそうさく", s:"刑事訴訟法" },
+  { k:"強制採尿", r:"きょうせいさいにょう", s:"刑事訴訟法" },
+  { k:"電気通信の傍受", r:"でんきつうしんのぼうじゅ", s:"刑事訴訟法" },
+  { k:"検証", r:"けんしょう", s:"刑事訴訟法" },
+  { k:"鑑定", r:"かんてい", s:"刑事訴訟法" },
+  { k:"実況見分調書", r:"じっきょうけんぶんちょうしょ", s:"刑事訴訟法" },
+  { k:"取調受忍義務", r:"とりしらべじゅにんぎむ", s:"刑事訴訟法" },
+  { k:"黙秘権", r:"もくひけん", s:"刑事訴訟法" },
+  { k:"自白の任意性", r:"じはくのにんいせい", s:"刑事訴訟法" },
+  { k:"起訴便宜主義", r:"きそべんぎしゅぎ", s:"刑事訴訟法" },
+  { k:"起訴独占主義", r:"きそどくせんしゅぎ", s:"刑事訴訟法" },
+  { k:"公訴時効", r:"こうそじこう", s:"刑事訴訟法" },
+  { k:"訴因の特定", r:"そいんのとくてい", s:"刑事訴訟法" },
+  { k:"公判前整理手続", r:"こうはんぜんせいりてつづき", s:"刑事訴訟法" },
+  { k:"証拠開示", r:"しょうこかいじ", s:"刑事訴訟法" },
+  { k:"証拠能力", r:"しょうこのうりょく", s:"刑事訴訟法" },
+  { k:"証明力", r:"しょうめいりょく", s:"刑事訴訟法" },
+  { k:"補強証拠", r:"ほきょうしょうこ", s:"刑事訴訟法" },
+  { k:"伝聞例外", r:"でんぶんれいがい", s:"刑事訴訟法" },
+  { k:"伝聞供述", r:"でんぶんきょうじゅつ", s:"刑事訴訟法" },
+  { k:"再伝聞", r:"さいでんぶん", s:"刑事訴訟法" },
+  { k:"検察官面前調書", r:"けんさつかんめんぜんちょうしょ", s:"刑事訴訟法" },
+  { k:"員面調書", r:"いんめんちょうしょ", s:"刑事訴訟法" },
+  { k:"特信情況", r:"とくしんじょうきょう", s:"刑事訴訟法" },
+  { k:"証人尋問", r:"しょうにんじんもん", s:"刑事訴訟法" },
+  { k:"反対尋問", r:"はんたいじんもん", s:"刑事訴訟法" },
+  { k:"択一的認定", r:"たくいつてきにんてい", s:"刑事訴訟法" },
+  { k:"簡易公判手続", r:"かんいこうはんてつづき", s:"刑事訴訟法" },
+  { k:"即決裁判手続", r:"そっけつさいばんてつづき", s:"刑事訴訟法" },
+  { k:"裁判員裁判", r:"さいばんいんさいばん", s:"刑事訴訟法" },
+  { k:"控訴", r:"こうそ", s:"刑事訴訟法" },
+  { k:"上告", r:"じょうこく", s:"刑事訴訟法" },
+  { k:"再審", r:"さいしん", s:"刑事訴訟法" },
+  { k:"保釈", r:"ほしゃく", s:"刑事訴訟法" },
+  { k:"接見交通", r:"せっけんこうつう", s:"刑事訴訟法" },
+  { k:"接見指定", r:"せっけんしてい", s:"刑事訴訟法" },
+  { k:"準現行犯逮捕", r:"じゅんげんこうはんたいほ", s:"刑事訴訟法" },
+  { k:"一罪一逮捕一勾留", r:"いちざいいちたいほいちこうりゅう", s:"刑事訴訟法" },
+  { k:"捜査", r:"そうさ", s:"刑事訴訟法" },
+  { k:"被疑者", r:"ひぎしゃ", s:"刑事訴訟法" },
+  { k:"被告人", r:"ひこくにん", s:"刑事訴訟法" },
+  { k:"弁護人", r:"べんごにん", s:"刑事訴訟法" },
+  { k:"国選弁護人", r:"こくせんべんごにん", s:"刑事訴訟法" },
+  { k:"逮捕状", r:"たいほじょう", s:"刑事訴訟法" },
+  { k:"捜索差押許可状", r:"そうさくさしおさえきょかじょう", s:"刑事訴訟法" },
+  { k:"別件捜索差押え", r:"べっけんそうさくさしおさえ", s:"刑事訴訟法" },
+  { k:"強制処分法定主義", r:"きょうせいしょぶんほうていしゅぎ", s:"刑事訴訟法" },
+  { k:"写真撮影", r:"しゃしんさつえい", s:"刑事訴訟法" },
+  { k:"別件基準説", r:"べっけんきじゅんせつ", s:"刑事訴訟法" },
+  { k:"本件基準説", r:"ほんけんきじゅんせつ", s:"刑事訴訟法" },
+  { k:"余罪取調べ", r:"よざいとりしらべ", s:"刑事訴訟法" },
+  { k:"起訴状一本主義", r:"きそじょういっぽんしゅぎ", s:"刑事訴訟法" },
+  { k:"訴因の予備的追加", r:"そいんのよびてきついか", s:"刑事訴訟法" },
+  { k:"訴因の択一的記載", r:"そいんのたくいつてききさい", s:"刑事訴訟法" },
+  { k:"公訴権の濫用", r:"こうそけんのらんよう", s:"刑事訴訟法" },
+  { k:"冒頭陳述", r:"ぼうとうちんじゅつ", s:"刑事訴訟法" },
+  { k:"証拠調べ請求", r:"しょうこしらべせいきゅう", s:"刑事訴訟法" },
+  { k:"同意書面", r:"どういしょめん", s:"刑事訴訟法" },
+  { k:"供述録取書", r:"きょうじゅつろくしゅしょ", s:"刑事訴訟法" },
+  { k:"自己負罪拒否特権", r:"じこふざいきょひとっけん", s:"刑事訴訟法" },
+  { k:"証拠裁判主義", r:"しょうこさいばんしゅぎ", s:"刑事訴訟法" },
+  { k:"挙証責任", r:"きょしょうせきにん", s:"刑事訴訟法" },
+  { k:"心証形成", r:"しんしょうけいせい", s:"刑事訴訟法" },
+  { k:"争点顕在化措置", r:"そうてんけんざいかそち", s:"刑事訴訟法" },
+
+  // 労働法
+  { k:"職務専念義務",                  r:"しょくむせんねんぎむ",                     s:"労働法" },
+  { k:"変更解約告知",                  r:"へんこうかいやくこくち",                   s:"労働法" },
+  { k:"労働者性",                      r:"ろうどうしゃせい",                         s:"労働法" },
+  { k:"不当労働行為",                  r:"ふとうろうどうこうい",                     s:"労働法" },
+  { k:"解雇権濫用",                    r:"かいこけんらんよう",                       s:"労働法" },
+  { k:"団結権",                        r:"だんけつけん",                             s:"労働法" },
+  { k:"団体交渉権",                    r:"だんたいこうしょうけん",                   s:"労働法" },
+  { k:"争議行為",                      r:"そうぎこうい",                             s:"労働法" },
+  { k:"就業規則",                      r:"しゅうぎょうきそく",                       s:"労働法" },
+  { k:"労働協約",                      r:"ろうどうきょうやく",                       s:"労働法" },
+  { k:"安全配慮義務",                  r:"あんぜんはいりょぎむ",                     s:"労働法" },
+  { k:"整理解雇",                      r:"せいりかいこ",                             s:"労働法" },
+  // 労働法（追加）
+  { k:"労働契約", r:"ろうどうけいやく", s:"労働法" },
+  { k:"労働条件", r:"ろうどうじょうけん", s:"労働法" },
+  { k:"労働基準法", r:"ろうどうきじゅんほう", s:"労働法" },
+  { k:"労働組合", r:"ろうどうくみあい", s:"労働法" },
+  { k:"使用者", r:"しようしゃ", s:"労働法" },
+  { k:"労働者", r:"ろうどうしゃ", s:"労働法" },
+  { k:"賃金", r:"ちんぎん", s:"労働法" },
+  { k:"平均賃金", r:"へいきんちんぎん", s:"労働法" },
+  { k:"割増賃金", r:"わりましちんぎん", s:"労働法" },
+  { k:"最低賃金", r:"さいていちんぎん", s:"労働法" },
+  { k:"法定労働時間", r:"ほうていろうどうじかん", s:"労働法" },
+  { k:"時間外労働", r:"じかんがいろうどう", s:"労働法" },
+  { k:"三六協定", r:"さぶろくきょうてい", s:"労働法" },
+  { k:"変形労働時間制", r:"へんけいろうどうじかんせい", s:"労働法" },
+  { k:"裁量労働制", r:"さいりょうろうどうせい", s:"労働法" },
+  { k:"年次有給休暇", r:"ねんじゆうきゅうきゅうか", s:"労働法" },
+  { k:"育児休業", r:"いくじきゅうぎょう", s:"労働法" },
+  { k:"介護休業", r:"かいごきゅうぎょう", s:"労働法" },
+  { k:"解雇予告", r:"かいこよこく", s:"労働法" },
+  { k:"普通解雇", r:"ふつうかいこ", s:"労働法" },
+  { k:"懲戒解雇", r:"ちょうかいかいこ", s:"労働法" },
+  { k:"懲戒処分", r:"ちょうかいしょぶん", s:"労働法" },
+  { k:"諭旨解雇", r:"ゆしかいこ", s:"労働法" },
+  { k:"雇止め", r:"やといどめ", s:"労働法" },
+  { k:"有期労働契約", r:"ゆうきろうどうけいやく", s:"労働法" },
+  { k:"無期転換", r:"むきてんかん", s:"労働法" },
+  { k:"配置転換", r:"はいちてんかん", s:"労働法" },
+  { k:"出向", r:"しゅっこう", s:"労働法" },
+  { k:"転籍", r:"てんせき", s:"労働法" },
+  { k:"昇進", r:"しょうしん", s:"労働法" },
+  { k:"降格", r:"こうかく", s:"労働法" },
+  { k:"休職", r:"きゅうしょく", s:"労働法" },
+  { k:"労働協約の規範的効力", r:"ろうどうきょうやくのきはんてきこうりょく", s:"労働法" },
+  { k:"団体行動権", r:"だんたいこうどうけん", s:"労働法" },
+  { k:"ストライキ", r:"すとらいき", s:"労働法" },
+  { k:"ロックアウト", r:"ろっくあうと", s:"労働法" },
+  { k:"組合活動", r:"くみあいかつどう", s:"労働法" },
+  { k:"ユニオンショップ", r:"ゆにおんしょっぷ", s:"労働法" },
+  { k:"黄犬契約", r:"おうけんけいやく", s:"労働法" },
+  { k:"支配介入", r:"しはいかいにゅう", s:"労働法" },
+  { k:"団体交渉拒否", r:"だんたいこうしょうきょひ", s:"労働法" },
+  { k:"不利益取扱い", r:"ふりえきとりあつかい", s:"労働法" },
+  { k:"労働委員会", r:"ろうどういいんかい", s:"労働法" },
+  { k:"救済命令", r:"きゅうさいめいれい", s:"労働法" },
+  { k:"セクシュアルハラスメント", r:"せくしゅあるはらすめんと", s:"労働法" },
+  { k:"パワーハラスメント", r:"ぱわーはらすめんと", s:"労働法" },
+  { k:"均等待遇", r:"きんとうたいぐう", s:"労働法" },
+  { k:"同一労働同一賃金", r:"どういつろうどうどういつちんぎん", s:"労働法" },
+  { k:"男女雇用機会均等法", r:"だんじょこようきかいきんとうほう", s:"労働法" },
+  { k:"過労死", r:"かろうし", s:"労働法" },
+  { k:"労災保険", r:"ろうさいほけん", s:"労働法" },
+  { k:"業務上災害", r:"ぎょうむじょうさいがい", s:"労働法" },
+  // 労働法（追加2）
+  { k:"労働三権", r:"ろうどうさんけん", s:"労働法" },
+  { k:"労働協約の一般的拘束力", r:"ろうどうきょうやくのいっぱんてきこうそくりょく", s:"労働法" },
+  { k:"就業規則の不利益変更", r:"しゅうぎょうきそくのふりえきへんこう", s:"労働法" },
+  { k:"就業規則の合理性", r:"しゅうぎょうきそくのごうりせい", s:"労働法" },
+  { k:"労働契約法", r:"ろうどうけいやくほう", s:"労働法" },
+  { k:"労働審判", r:"ろうどうしんぱん", s:"労働法" },
+  { k:"労使協定", r:"ろうしきょうてい", s:"労働法" },
+  { k:"労使慣行", r:"ろうしかんこう", s:"労働法" },
+  { k:"賞与", r:"しょうよ", s:"労働法" },
+  { k:"退職金", r:"たいしょくきん", s:"労働法" },
+  { k:"休憩", r:"きゅうけい", s:"労働法" },
+  { k:"休日", r:"きゅうじつ", s:"労働法" },
+  { k:"深夜労働", r:"しんやろうどう", s:"労働法" },
+  { k:"フレックスタイム制", r:"ふれっくすたいむせい", s:"労働法" },
+  { k:"みなし労働時間制", r:"みなしろうどうじかんせい", s:"労働法" },
+  { k:"労働災害", r:"ろうどうさいがい", s:"労働法" },
+  { k:"通勤災害", r:"つうきんさいがい", s:"労働法" },
+  { k:"労災補償", r:"ろうさいほしょう", s:"労働法" },
+  { k:"解雇", r:"かいこ", s:"労働法" },
+  { k:"解雇制限", r:"かいこせいげん", s:"労働法" },
+  { k:"試用期間", r:"しようきかん", s:"労働法" },
+  { k:"本採用拒否", r:"ほんさいようきょひ", s:"労働法" },
+  { k:"内定", r:"ないてい", s:"労働法" },
+  { k:"内定取消し", r:"ないていとりけし", s:"労働法" },
+  { k:"定年制", r:"ていねんせい", s:"労働法" },
+  { k:"継続雇用", r:"けいぞくこよう", s:"労働法" },
+  { k:"労働者派遣", r:"ろうどうしゃはけん", s:"労働法" },
+  { k:"偽装請負", r:"ぎそううけおい", s:"労働法" },
+  { k:"均衡待遇", r:"きんこうたいぐう", s:"労働法" },
+  { k:"誠実交渉義務", r:"せいじつこうしょうぎむ", s:"労働法" },
+  { k:"便宜供与", r:"べんぎきょうよ", s:"労働法" },
+  { k:"争議行為の正当性", r:"そうぎこういのせいとうせい", s:"労働法" },
+  { k:"政治スト", r:"せいじすと", s:"労働法" },
+  { k:"懲戒権", r:"ちょうかいけん", s:"労働法" },
+  { k:"減給", r:"げんきゅう", s:"労働法" },
+  { k:"出勤停止", r:"しゅっきんていし", s:"労働法" },
+  { k:"未払賃金", r:"みばらいちんぎん", s:"労働法" },
+  { k:"賃金請求権", r:"ちんぎんせいきゅうけん", s:"労働法" },
+];
+
+/* 準備中科目の設定 */
+const WIP_SUBJECTS = new Set([]);
+const klen = w => [...w.k].length;
+
+const SUBJECT_ROWS = [
+  ["憲法","行政法"],
+  ["民法"],
+  ["会社法","民事訴訟法"],
+  ["刑法","刑事訴訟法"],
+  ["労働法"],
+];
+const subjectCourse = s => ({ name:s+"コース", desc:s, filter:w=>w.s===s, wip:WIP_SUBJECTS.has(s) });
+
+const LENGTH_COURSES = [
+  { name:"ストゥディアコース", desc:"2〜6文字", filter:w=>klen(w)>=2 && klen(w)<=6 },
+  { name:"LEGAL QUESTコース", desc:"5〜9文字", filter:w=>klen(w)>=5 && klen(w)<=9 },
+  { name:"芦部コース", desc:"7文字以上", filter:w=>klen(w)>=7 },
+];
+
+const ALL_COURSE = { name:"総まくりコース", desc:"全単語ランダム", filter:()=>true };
+
+/* ローマ字判定エンジン */
+const BASE = {
+ 'あ':['a'],'い':['i'],'う':['u'],'え':['e'],'お':['o'],
+ 'か':['ka'],'き':['ki'],'く':['ku'],'け':['ke'],'こ':['ko'],
+ 'さ':['sa'],'し':['shi','si'],'す':['su'],'せ':['se'],'そ':['so'],
+ 'た':['ta'],'ち':['chi','ti'],'つ':['tsu','tu'],'て':['te'],'と':['to'],
+ 'な':['na'],'に':['ni'],'ぬ':['nu'],'ね':['ne'],'の':['no'],
+ 'は':['ha'],'ひ':['hi'],'ふ':['fu','hu'],'へ':['he'],'ほ':['ho'],
+ 'ま':['ma'],'み':['mi'],'む':['mu'],'め':['me'],'も':['mo'],
+ 'や':['ya'],'ゆ':['yu'],'よ':['yo'],
+ 'ら':['ra'],'り':['ri'],'る':['ru'],'れ':['re'],'ろ':['ro'],
+ 'わ':['wa'],'を':['wo'],
+ 'が':['ga'],'ぎ':['gi'],'ぐ':['gu'],'げ':['ge'],'ご':['go'],
+ 'ざ':['za'],'じ':['ji','zi'],'ず':['zu'],'ぜ':['ze'],'ぞ':['zo'],
+ 'だ':['da'],'ぢ':['di','ji'],'づ':['du','zu'],'で':['de'],'ど':['do'],
+ 'ば':['ba'],'び':['bi'],'ぶ':['bu'],'べ':['be'],'ぼ':['bo'],
+ 'ぱ':['pa'],'ぴ':['pi'],'ぷ':['pu'],'ぺ':['pe'],'ぽ':['po'],
+ 'ぁ':['la','xa'],'ぃ':['li','xi'],'ぅ':['lu','xu'],'ぇ':['le','xe'],'ぉ':['lo','xo'],
+ 'ー':['-'],
+};
+const YOUON = {
+ 'きゃ':['kya'],'きゅ':['kyu'],'きょ':['kyo'],
+ 'しゃ':['sha','sya'],'しゅ':['shu','syu'],'しょ':['sho','syo'],
+ 'ちゃ':['cha','tya','cya'],'ちゅ':['chu','tyu','cyu'],'ちょ':['cho','tyo','cyo'],
+ 'にゃ':['nya'],'にゅ':['nyu'],'にょ':['nyo'],
+ 'ひゃ':['hya'],'ひゅ':['hyu'],'ひょ':['hyo'],
+ 'みゃ':['mya'],'みゅ':['myu'],'みょ':['myo'],
+ 'りゃ':['rya'],'りゅ':['ryu'],'りょ':['ryo'],
+ 'ぎゃ':['gya'],'ぎゅ':['gyu'],'ぎょ':['gyo'],
+ 'じゃ':['ja','jya','zya'],'じゅ':['ju','jyu','zyu'],'じょ':['jo','jyo','zyo'],
+ 'びゃ':['bya'],'びゅ':['byu'],'びょ':['byo'],
+ 'ぴゃ':['pya'],'ぴゅ':['pyu'],'ぴょ':['pyo'],
+};
+const VOWELS = 'aiueo';
+
+function buildUnits(reading){
+  const units=[]; let i=0, sokuon=false;
+  while(i<reading.length){
+    const ch=reading[i], two=reading.substr(i,2);
+    if(ch==='っ'||ch==='ッ'){ sokuon=true; i++; continue; }
+    let rom, kana;
+    if(YOUON[two]){ rom=YOUON[two].slice(); kana=two; i+=2; }
+    else if(ch==='ん'||ch==='ン'){ units.push({kana:'ん', _nn:true}); i++; continue; }
+    else if(BASE[ch]){ rom=BASE[ch].slice(); kana=ch; i++; }
+    else { i++; continue; }
+    if(sokuon){
+      rom = rom.flatMap(r=>{ const arr=[ r[0]+r ]; if(r.startsWith('ch')) arr.push('t'+r); return arr; });
+      kana='っ'+kana; sokuon=false;
+    }
+    units.push({kana, romaji:rom});
+  }
+  units.forEach((u,idx)=>{
+    if(!u._nn) return;
+    const next=units[idx+1]; let single=false;
+    if(next && next.romaji){ const c=next.romaji[0][0]; if(!VOWELS.includes(c)&&c!=='n'&&c!=='y') single=true; }
+    u.romaji = single ? ['n','nn'] : ['nn']; delete u._nn;
+  });
+  return units;
+}
+
+/* ゲーム状態 */
+const el = id => document.getElementById(id);
+const readingEl=el('reading'), termEl=el('term'), echoEl=el('echo'),
+      panel=el('panel'), stamp=el('stamp'), goStamp=el('goStamp'), timeupStamp=el('timeupStamp'), eyebrow=el('eyebrow');
+
+let units=[], unitIdx=0, buffer='', doneRomaji=[];
+let pool=[], order=[], orderPos=0, current=null;
+let activeCourse=null;
+let running=false, timeLeft=60, timerId=null;
+let cleared=0, correctKeys=0, mistakes=0;
+let combo=0, maxCombo=0, lastBonusIdx=0, bonusTotal=0;
+let consecutiveMiss=0, savedCombo=0, errorChars=[];
+let isStrictBS = false;
+let previousStepCombo = 0;
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+function shuffle(n){ const a=[...Array(n).keys()]; for(let i=a.length-1;i>0;i--){ const j=Math.random()*(i+1)|0; [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* 評価ランク判定 */
+function getRank(totalKeys){
+  if(totalKeys >= 550) return 'S+';
+  if(totalKeys >= 500) return 'S';
+  if(totalKeys >= 450) return 'S-';
+  if(totalKeys >= 430) return 'A+';
+  if(totalKeys >= 400) return 'A';
+  if(totalKeys >= 350) return 'A-';
+  if(totalKeys >= 330) return 'B+';
+  if(totalKeys >= 300) return 'B';
+  if(totalKeys >= 250) return 'B-';
+  if(totalKeys >= 230) return 'C+';
+  if(totalKeys >= 200) return 'C';
+  if(totalKeys >= 150) return 'C-';
+  if(totalKeys >= 130) return 'D+';
+  if(totalKeys >= 100) return 'D';
+  if(totalKeys >= 50)  return 'D-';
+  return 'E';
+}
+
+function nextWord(){
+  if(orderPos>=order.length){ order=shuffle(pool.length); orderPos=0; }
+  current=pool[order[orderPos++]];
+  units=buildUnits(current.r);
+  unitIdx=0; buffer=''; doneRomaji=[]; errorChars=[];
+  termEl.textContent=current.k;
+  render();
+}
+
+function render(){
+  readingEl.innerHTML = units.map((u,i)=>{
+    const cls = i<unitIdx ? 'u done' : (i===unitIdx ? 'u cur' : 'u');
+    return `<span class="${cls}">${u.kana}</span>`;
+  }).join('');
+  const typed = doneRomaji.join('') + buffer;
+  const errs = errorChars.join('');
+  echoEl.innerHTML = `<span class="typed">${typed}</span>`
+    + (errs ? `<span class="err">${errs}</span>` : '')
+    + `<span class="caret">&nbsp;</span>`;
+}
+
+function updateStats(){
+  el('stClear').textContent=cleared;
+  const total=correctKeys+mistakes;
+  el('stAcc').textContent = total? Math.round(correctKeys/total*100) : 100;
+}
+
+function updateCombo(){
+  if(combo>maxCombo) maxCombo=combo;
+  el('stCombo').textContent=combo;
+  
+  const gauge = el('comboGauge');
+  const progress = (combo % 30) / 30 * 100;
+  gauge.style.width = (combo > 0 && progress === 0 ? 100 : progress) + '%';
+
+  const bubble = el('comboBubble');
+  const currentStep = Math.floor(combo / 10) * 10;
+  
+  if(currentStep >= 10){
+    bubble.textContent = `${currentStep} COMBO`;
+    bubble.classList.add('visible');
+    
+    if(currentStep > previousStepCombo){
+      bubble.classList.remove('pop');
+      void bubble.offsetWidth;
+      bubble.classList.add('pop');
+      previousStepCombo = currentStep;
+    }
+  } else {
+    bubble.classList.remove('visible');
+    bubble.classList.remove('pop');
+    previousStepCombo = 0;
+  }
+}
+
+function updateTimebar(){
+  el('stTime').textContent = Math.max(0, timeLeft).toFixed(1);
+  const vis=Math.max(60,timeLeft);
+  const fill=el('timebarFill');
+  fill.style.width=Math.max(0,Math.min(1,timeLeft/vis))*100+'%';
+  fill.classList.toggle('low', timeLeft<=10);
+}
+
+const BONUS=[1,1,2,3];
+function awardBonus(){
+  const idx=Math.floor(combo/30);
+  if(idx<=lastBonusIdx) return;
+  for(let k=lastBonusIdx+1;k<=idx;k++){
+    const add=BONUS[Math.min(k-1,BONUS.length-1)];
+    timeLeft+=add; bonusTotal+=add; flashBonus(add);
+  }
+  lastBonusIdx=idx;
+  updateTimebar();
+}
+
+function flashBonus(sec){
+  const f=el('bonusFlash'); f.textContent='＋'+sec+'秒';
+  f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+}
+
+function press(key){
+  let guard=0;
+  while(guard++<4){
+    const unit=units[unitIdx];
+    if(!unit) return 'idle';
+    const nb=buffer+key;
+    const cand=unit.romaji.filter(r=>r.startsWith(nb));
+    if(cand.length){
+      buffer=nb;
+      const exact=unit.romaji.includes(buffer);
+      const longer=cand.some(r=>r.length>buffer.length);
+      if(exact && !longer) advanceUnit();
+      return 'ok';
+    }
+    if(unit.romaji.includes(buffer)){ advanceUnit(); continue; }
+    return 'miss';
+  }
+  return 'miss';
+}
+
+function advanceUnit(){ doneRomaji.push(buffer); buffer=''; unitIdx++; }
+function wordComplete(){ return unitIdx>=units.length; }
+function playStamp(){ stamp.classList.remove('go'); void stamp.offsetWidth; stamp.classList.add('go'); }
+
+function showTitle(){
+  running=false; clearInterval(timerId);
+  el('ovModes').classList.add('hide'); el('ovResult').classList.add('hide');
+  el('ovTitle').classList.remove('hide');
+  eyebrow.textContent='司法試験 · 用語ドリル';
+  termEl.textContent='—'; readingEl.innerHTML=''; echoEl.innerHTML='';
+}
+
+function showModes(){
+  running=false; clearInterval(timerId);
+  el('ovTitle').classList.add('hide'); el('ovResult').classList.add('hide');
+  el('ovModes').classList.remove('hide');
+  eyebrow.textContent='コース選択';
+  setTab('subject');
+  termEl.textContent='—'; readingEl.innerHTML=''; echoEl.innerHTML='';
+}
+
+function makeCourseButton(c){
+  const b=document.createElement('button'); b.className='course';
+  const label = c.name;
+  if(c.wip){
+    b.classList.add('wip'); b.disabled=true;
+    b.innerHTML=`<span class="cname">${label}</span><span class="cdesc wip-tag">準備中</span>`;
+  }else{
+    const n = WORDS.filter(c.filter).length;
+    b.innerHTML=`<span class="cname">${label}</span><span class="cdesc">${c.desc}・${n}語</span>`;
+    b.addEventListener('click', ()=>{
+      startPageTurnAndGame(c);
+    });
+  }
+  return b;
+}
+
+function renderTab(tab){
+  const body=el('tabBody'); body.innerHTML='';
+  if(tab==='length'){
+    const list=document.createElement('div'); list.className='course-list one';
+    LENGTH_COURSES.forEach(c=> list.appendChild(makeCourseButton(c)));
+    body.appendChild(list);
+  }else if(tab==='all'){
+    const list=document.createElement('div'); list.className='course-list one';
+    list.appendChild(makeCourseButton(ALL_COURSE));
+    body.appendChild(list);
+  }else{
+    const grid=document.createElement('div'); grid.className='course-list';
+    SUBJECT_ROWS.forEach(row=>{
+      row.forEach(s=> grid.appendChild(makeCourseButton(subjectCourse(s))));
+      if(row.length===1){ const sp=document.createElement('div'); sp.className='course-spacer'; grid.appendChild(sp); }
+    });
+    body.appendChild(grid);
+  }
+}
+
+function setTab(tab){
+  document.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', t.dataset.tab===tab));
+  renderTab(tab);
+}
+
+function startPageTurnAndGame(course){
+  const flip = el('pageFlip');
+  const ready = el('readyOverlay');
+  
+  el('ovModes').classList.add('hide');
+  el('ovResult').classList.add('hide');
+  timeupStamp.classList.remove('go');
+  
+  flip.classList.remove('flip');
+  void flip.offsetWidth;
+  flip.classList.add('flip');
+
+  ready.classList.add('show');
+
+  setTimeout(() => {
+    ready.classList.remove('show');
+    goStamp.classList.remove('go');
+    void goStamp.offsetWidth;
+    goStamp.classList.add('go');
+
+    startCourse(course);
+  }, 1000);
+}
+
+function startCourse(course){
+  if(!course) return;
+  activeCourse=course;
+  isStrictBS = el('chkStrictBS').checked;
+  pool=WORDS.filter(course.filter);
+  if(!pool.length) pool=WORDS.slice();
+  el('ovTitle').classList.add('hide'); el('ovModes').classList.add('hide'); el('ovResult').classList.add('hide');
+  eyebrow.textContent=course.name + (isStrictBS ? " [精密]" : "");
+  running=true; timeLeft=60; cleared=0; correctKeys=0; mistakes=0;
+  combo=0; maxCombo=0; lastBonusIdx=0; bonusTotal=0; consecutiveMiss=0; savedCombo=0; errorChars=[]; previousStepCombo=0;
+  updateStats(); updateCombo(); updateTimebar();
+  order=shuffle(pool.length); orderPos=0;
+  nextWord();
+  clearInterval(timerId);
+  timerId=setInterval(()=>{
+    timeLeft-=0.1;
+    updateTimebar();
+    if(timeLeft<=0){
+      timeLeft=0;
+      updateTimebar();
+      clearInterval(timerId);
+      endGame();
+    }
+  },100);
+}
+
+async function endGame(){
+  running=false;
+  clearInterval(timerId);
+
+  termEl.textContent=''; readingEl.innerHTML=''; echoEl.innerHTML='';
+  timeupStamp.classList.remove('go');
+  void timeupStamp.offsetWidth;
+  timeupStamp.classList.add('go');
+
+  await sleep(2000);
+
+  const total=correctKeys+mistakes;
+  const dur=60+bonusTotal;
+  
+  el('rRank').textContent = getRank(total);
+  el('rKeys').textContent = total;
+  el('rClear').textContent = cleared;
+  el('rCombo').textContent = maxCombo;
+  el('rAcc').textContent = total ? Math.round(correctKeys/total*100) : 100;
+  el('rKpm').textContent = Math.round(correctKeys/dur*60);
+  el('rCourse').textContent = (activeCourse ? activeCourse.name : '') + (isStrictBS ? "（精密モード）" : "");
+
+  const items = [
+    el('rItemRank'),
+    el('rItem1'),
+    el('rItem2'),
+    el('rItem3'),
+    el('rItem4'),
+    el('rItem5')
+  ];
+  items.forEach(item => item.classList.remove('visible'));
+  el('rBtnRow').classList.remove('visible');
+  
+  timeupStamp.classList.remove('go');
+  el('ovResult').classList.remove('hide');
+
+  await sleep(200);
+  items[0].classList.add('visible');
+
+  await sleep(400);
+  items[1].classList.add('visible');
+
+  await sleep(400);
+  items[2].classList.add('visible');
+
+  await sleep(400);
+  items[3].classList.add('visible');
+
+  await sleep(400);
+  items[4].classList.add('visible');
+
+  await sleep(400);
+  items[5].classList.add('visible');
+
+  await sleep(500);
+  el('rBtnRow').classList.add('visible');
+}
+
+window.addEventListener('keydown', e=>{
+  if(e.key === 'Escape'){
+    e.preventDefault();
+    showModes();
+    return;
+  }
+
+  if(!running){
+    if(e.key==='Enter'||e.key===' '){
+      if(!el('ovResult').classList.contains('hide')){
+        e.preventDefault();
+        startPageTurnAndGame(activeCourse);
+      }
+    }
+    return;
+  }
+
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(e.key==='Backspace'){ e.preventDefault(); onBackspace(); return; }
+  const key=e.key.toLowerCase();
+  if(key.length!==1 || !/[a-z\-]/.test(key)) return;
+  e.preventDefault();
+  onGameKey(key);
+});
+
+function onGameKey(key){
+  if(isStrictBS){
+    if(errorChars.length > 0){
+      registerMiss(key);
+      return;
+    }
+    const res = press(key);
+    if(res === 'ok'){
+      correctKeys++; combo++; updateCombo(); awardBonus();
+      if(wordComplete()){ cleared++; playStamp(); setTimeout(nextWord, 130); }
+      else render();
+    } else {
+      registerMiss(key);
+    }
+  } else {
+    const res = press(key);
+    if(res === 'ok'){
+      correctKeys++; 
+      combo++; 
+      updateCombo(); 
+      awardBonus();
+      if(wordComplete()){ cleared++; playStamp(); setTimeout(nextWord, 130); }
+      else render();
+    } else {
+      mistakes++;
+      combo = 0;
+      updateCombo();
+      panel.classList.remove('miss'); void panel.offsetWidth; panel.classList.add('miss');
+    }
+  }
+  updateStats();
+}
+
+function registerMiss(key){
+  mistakes++;
+  if(consecutiveMiss===0) savedCombo=combo;
+  consecutiveMiss++;
+  errorChars.push(key);
+  combo=0; updateCombo();
+  render();
+  panel.classList.remove('miss'); void panel.offsetWidth; panel.classList.add('miss');
+  updateStats();
+}
+
+function onBackspace(){
+  if(errorChars.length===0) return;
+  errorChars.pop();
+  if(errorChars.length===0){
+    if(consecutiveMiss<=5 && savedCombo>0){ combo=savedCombo; }
+    else { lastBonusIdx=0; }
+    consecutiveMiss=0; savedCombo=0;
+    updateCombo();
+  }
+  render();
+}
+
+el('btnStrictInfo').addEventListener('click', (e)=>{
+  e.preventDefault();
+  e.stopPropagation();
+  el('modalInfo').classList.remove('hide');
+});
+el('btnCloseModal').addEventListener('click', ()=>{
+  el('modalInfo').classList.add('hide');
+});
+
+el('btnGameStart').addEventListener('click', showModes);
+el('btnRetry').addEventListener('click', ()=>{
+  startPageTurnAndGame(activeCourse);
+});
+el('btnBackModes').addEventListener('click', showModes);
+
+document.querySelectorAll('.tab').forEach(t=> t.addEventListener('click', ()=>setTab(t.dataset.tab)));
+setTab('subject');
+</script>
+</body>
+</html>
