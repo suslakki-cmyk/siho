@@ -583,6 +583,7 @@ const WORDS = [
   { k:"生存権",                        r:"せいぞんけん",                             s:"憲法" },
   { k:"幸福追求権",                    r:"こうふくついきゅうけん",                   s:"憲法" },
   { k:"知る権利",                      r:"しるけんり",                               s:"憲法" },
+  { k:"パブリックフォーラム",          r:"ぱぶりっくふぉーらむ",                     s:"憲法" },
   { k:"比例原則",                  r:"ひれいげんそく",                     s:"憲法" },
   { k:"法の下の平等",                  r:"ほうのもとのびょうどう",                   s:"憲法" },
   { k:"精神的自由権",                  r:"せいしんてきじゆうけん",                   s:"憲法" },
@@ -1017,6 +1018,7 @@ const WORDS = [
 
 
   // 会社法
+  { k:"エクイティ",                    r:"えくいてぃ",                               s:"会社法" },
   { k:"会社分割",                      r:"かいしゃぶんかつ",                         s:"会社法" },
   { k:"取締役会",                      r:"とりしまりやくかい",                       s:"会社法" },
   { k:"株主総会",                      r:"かぶぬしそうかい",                         s:"会社法" },
@@ -1668,7 +1670,22 @@ const YOUON = {
  'じゃ':['ja','jya','zya'],'じゅ':['ju','jyu','zyu'],'じょ':['jo','jyo','zyo'],
  'びゃ':['bya'],'びゅ':['byu'],'びょ':['byo'],
  'ぴゃ':['pya'],'ぴゅ':['pyu'],'ぴょ':['pyo'],
+
+ /* 外来語用の拗音（小さい ぁぃぅぇぉ が続く音） */
+ 'ふぁ':['fa'],'ふぃ':['fi'],'ふぇ':['fe'],'ふぉ':['fo'],
+ 'うぁ':['wha'],'うぃ':['wi','whi'],'うぇ':['we','whe'],'うぉ':['who'],
+ 'ゔぁ':['va'],'ゔぃ':['vi'],'ゔぇ':['ve'],'ゔぉ':['vo'],
+ 'てぃ':['thi','texi','teli'],'てゅ':['thu','tyu'],'とぅ':['twu','toxu'],
+ 'でぃ':['dhi','dexi','deli'],'でゅ':['dhu'],'どぅ':['dwu','doxu'],
+ 'つぁ':['tsa'],'つぃ':['tsi'],'つぇ':['tse'],'つぉ':['tso'],
+ 'くぁ':['qua','kwa'],'くぃ':['qui','kwi'],'くぇ':['que','kwe'],'くぉ':['quo','kwo'],
+ 'ぐぁ':['gwa'],
+ 'ちぇ':['che'],'じぇ':['je','jye'],'しぇ':['she'],
+ 'いぇ':['ye'],
+ 'きぇ':['kye'],'ぎぇ':['gye'],'にぇ':['nye'],'ひぇ':['hye'],'びぇ':['bye'],'ぴぇ':['pye'],'みぇ':['mye'],'りぇ':['rye'],
 };
+const EXTRA_BASE = { 'ゔ':['vu'] };
+Object.assign(BASE, EXTRA_BASE);
 const VOWELS = 'aiueo';
 
 function buildUnits(reading){
@@ -1717,6 +1734,9 @@ function shuffle(n){ const a=[...Array(n).keys()]; for(let i=a.length-1;i>0;i--)
 
 /* 評価ランク判定 */
 function getRank(totalKeys){
+  if(totalKeys >= 700) return 'SS+';
+  if(totalKeys >= 650) return 'SS';
+  if(totalKeys >= 600) return 'SS-';
   if(totalKeys >= 550) return 'S+';
   if(totalKeys >= 500) return 'S';
   if(totalKeys >= 450) return 'S-';
@@ -2056,6 +2076,7 @@ function onGameKey(key){
     } else {
       mistakes++;
       combo = 0;
+      lastBonusIdx = 0;
       updateCombo();
       panel.classList.remove('miss'); void panel.offsetWidth; panel.classList.add('miss');
     }
@@ -2078,8 +2099,8 @@ function onBackspace(){
   if(errorChars.length===0) return;
   errorChars.pop();
   if(errorChars.length===0){
-    if(consecutiveMiss<=5 && savedCombo>0){ combo=savedCombo; }
-    else { lastBonusIdx=0; }
+    // 精密モード：訂正してもコンボは復帰しない（途切れたまま）
+    lastBonusIdx=0;
     consecutiveMiss=0; savedCombo=0;
     updateCombo();
   }
